@@ -91,7 +91,7 @@ export const UI = ({ hidden, meta_ui }) => {
                         className="fixed top-0 left-0 h-full w-64 bg-black border-blue-700 border-r-2  shadow-2xl z-20 p-6 flex flex-col gap-6"
                     >
                         <h2 className="text-white text-2xl font-bold border-b border-gray-600 pb-2">
-                            Menu
+                            Chats
                         </h2>
                         <button
                             onClick={() => setSidebarOpen(false)}

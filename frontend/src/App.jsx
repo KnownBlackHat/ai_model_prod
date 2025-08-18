@@ -4,7 +4,6 @@ import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
 import { Experience } from "./components/Experience";
 import { UI } from "./components/UI";
-import BgVideo from "./assets/bg5.mp4";
 import React, { useState } from "react";
 import { useGLTF } from "@react-three/drei";
 // https://prod.spline.design/SPIIV5uOhPCNalYB/scene.splinecode
@@ -19,9 +18,14 @@ function App() {
     const [facialExpression, setFacialExpression] = useState("");
 
     const meta_ui = { animations, animation, setAnimation, facialExpression, setFacialExpression };
+    const isMobile = window.screen.width < window.screen.height;
 
     return (
-        <>
+        isMobile ? <>
+            <div className='h-screen w-screen text-center flex items-center justify-center'>
+                This website isn't compatible with mobile view
+            </div>
+        </> : <>
             <Spline
                 // scene="https://prod.spline.design/SPIIV5uOhPCNalYB/scene.splinecode"
                 // scene="https://prod.spline.design/TJ95vhU6CBg7fNbH/scene.splinecode"
@@ -38,6 +42,7 @@ function App() {
                 <Experience meta_ui={meta_ui} />
             </Canvas>
         </>
+
     );
 }
 
