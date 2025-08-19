@@ -147,7 +147,7 @@ export const UI = ({ hidden, meta_ui }) => {
                             <>
                                 {audioState === "idle" ? (
                                     <button
-                                        className="text-2xl bg-purple-600 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-purple-700"
+                                        className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
                                         onClick={speechRecon}
                                     >
                                         <FaMicrophoneAlt />
@@ -167,7 +167,7 @@ export const UI = ({ hidden, meta_ui }) => {
                             <button
                                 disabled={loading || message}
                                 onClick={sendMessage}
-                                className={`text-2xl bg-green-600 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-green-700 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
+                                className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
                                     }`}
                             >
                                 <IoSendSharp />
