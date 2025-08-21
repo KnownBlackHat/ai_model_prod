@@ -5,7 +5,7 @@ import { IoSendSharp } from "react-icons/io5";
 import CompanyLogo from "../assets/cybergenix.png";
 import { motion, AnimatePresence } from "framer-motion";
 
-const WAKE_WORD = ["mili", "lily", "lilly", "millie", "milli", "mini", "mily", "milly", "billy", "bily"];
+const WAKE_WORD = ["niva", " va ", "liva"];
 
 export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
@@ -137,7 +137,7 @@ export const UI = ({ hidden, meta_ui }) => {
                         {audioState === "idle" && (
                             <input
                                 className="w-full border-2 border-white placeholder:text-gray-500 placeholder:italic p-4 rounded-xl bg-white/20 text-white backdrop-blur-md focus:outline-none"
-                                placeholder="Ask from Millie..."
+                                placeholder="Ask from Niva..."
                                 ref={input}
                                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                             />
