@@ -1,0 +1,105 @@
+version: "3.7"
+
+x-restart-policy: &restart_policy
+  restart: unless-stopped
+
+services:
+
+  tts:
+    <<: *restart_policy
+    hostname: tts01
+
+    build:
+      context: ./tts/.
+      dockerfile: Dockerfile
+
+    expose:
+      - "5002"
+
+    networks:
+        - ai
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+
+  loadbalancer:
+    <<: *restart_policy
+    container_name: loadbalancer
+    
+    image: nginx:latest
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/nginx.conf:ro
+
+    depends_on:
+      - tts
+
+    ports:
+      - "4000:4000"
+    
+    networks:
+      - ai
+
+  backend:
+    <<: *restart_policy
+    container_name: backend
+    build:
+      context: ./backendv2/.
+      dockerfile: Dockerfile
+
+    environment:
+      - OLLAMA_SERVER=http://192.168.0.114:11434
+      - GROQ_API_KEY=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
+
+
+    depends_on:
+      - tts
+
+    volumes:
+      - ./backendv2:/app
+
+
+    networks:
+        - ai
+        - lan_access
+
+    ports:
+      - 3000:3000
+
+
+  frontend:
+    <<: *restart_policy
+    container_name: frontend
+
+    build:
+      context: ./frontend/.
+      dockerfile: Dockerfile
+
+    tty: true
+
+
+    networks:
+      - ai
+
+    depends_on:
+      - backend
+
+    volumes:
+      - ./frontend:/app
+
+    environment:
+      - VITE_BACKENDADDR=0.0.0.0:3000
+
+    ports:
+      - 80:5173
+
+
+
+networks:
+    ai:
+      name: ai
+    lan_access:
+      driver: bridge
