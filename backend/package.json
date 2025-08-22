@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.11.0",
     "@google/generative-ai": "^0.21.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",

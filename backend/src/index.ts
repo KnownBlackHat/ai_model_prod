@@ -1,12 +1,13 @@
-import { exec } from 'child_process';
+import {exec} from 'child_process';
+import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import axios from 'axios';
 import wiki from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import { promises as fs } from 'fs';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {promises as fs} from 'fs';
+import {GoogleGenerativeAI} from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
 interface AiResponse {
@@ -19,7 +20,7 @@ interface AiResponse {
 const CONTEXT_FILE = 'context.json';
 // const voiceID = '9BWtsMINqrJLrRacOk9x';
 const voiceID = 'p364';
-const groq_agent = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq_agent = new Groq({apiKey: process.env.GROQ_API_KEY});
 dotenv.config();
 
 // function arrayBufferToBase64(buffer: ArrayBuffer) {
@@ -40,17 +41,23 @@ interface Embeds {
   inline: Boolean;
 }
 
-async function report_discord(content: string) {
+async function report_discord(input: string, output: string, error: Boolean) {
   const embed = {
     title: 'Ai_Model Log',
-    color: 0xff0000,
+    color: error ? 0xff0000 : 0x008000,
     timestamp: new Date().toISOString(),
     fields: [] as Embeds[],
   };
 
   embed.fields.push({
-    name: 'Log',
-    value: `\`\`\`${content}\`\`\``,
+    name: 'Input',
+    value: `\`\`\`${input}\`\`\``,
+    inline: false,
+  });
+
+  embed.fields.push({
+    name: 'Output',
+    value: `\`\`\`${output}\`\`\``,
     inline: false,
   });
 
@@ -230,8 +237,8 @@ async function groq(query: string): Promise<AiResponse[]> {
       {
         role: 'system',
         content: `
-        You are a chatbot for Cybergenix, responsible for sharing details about events involving our product, Niva, at Cybergenix private limited.
-        Rely solely on the provided context for recent information. Use a formal tone, avoiding asterisks or emojis.
+        You are ai assistant named Niva at Cybergenix private limited.
+        Use a formal tone, avoiding asterisks or emojis.
         Respond with a JSON array containing up to two messages, each with a text, facialExpression, and animation property. Available facial expressions are: smile, sad, angry, surprised, funnyFace, and default. Available animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
         Respond accordingly and provide a json output containing following keys:
           - 'text' it will contain the reply which niva will speak.
@@ -262,6 +269,27 @@ async function groq(query: string): Promise<AiResponse[]> {
       },
       {
         role: 'user',
+        content: 'what is stock price',
+      },
+      {
+        role: 'assistant',
+        content: `
+        [
+          {
+            text: "A stock price (or share price) refers to the current market value of a single share of a publicly traded company's stock.",
+            facialExpression: 'smile',
+            animation: 'Talking_0',
+          },
+          {
+            text: "For example, if a company's stock price is $150, that means one share can currently be bought or sold at around that amount. Prices are often quoted with additional details like daily high/low, trading volume, and market cap (total value of all shares).",
+            facialExpression: 'surprised',
+            animation: 'Talking_1',
+          },
+        ]
+        `,
+      },
+      {
+        role: 'user',
         content: query,
       },
     ],
@@ -273,11 +301,19 @@ async function groq(query: string): Promise<AiResponse[]> {
     const response: AiResponse[] = JSON.parse(raw_response);
     checkKeys(response);
     console.log('groq: ', response);
-    await report_discord(`groq: ${JSON.stringify(response)}`);
+    await report_discord(query, JSON.stringify(response), false);
     return response;
   } catch (e) {
     console.log('error:', e);
-    await report_discord(`error: ${e}`);
+    await report_discord(
+      query,
+      `
+      Error: ${e}
+      Raw Response: ${raw_response}
+      `,
+      true,
+    );
+    return groq(query); // RISKY CODE
     return [
       {
         text: 'Sorry i was not able to hear you, could you please repeat your query!',
@@ -398,7 +434,7 @@ app.post('/chat', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({ messages });
+  res.send({messages});
 });
 
 const readJsonTranscript = async (file: string) => {
