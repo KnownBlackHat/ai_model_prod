@@ -273,7 +273,7 @@ async function groq(query: string): Promise<AiResponse[]> {
     const response: AiResponse[] = JSON.parse(raw_response);
     checkKeys(response);
     console.log('groq: ', response);
-    await report_discord(`groq: ${response}`);
+    await report_discord(`groq: ${JSON.stringify(response)}`);
     return response;
   } catch (e) {
     console.log('error:', e);
