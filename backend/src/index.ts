@@ -56,7 +56,7 @@ async function report_discord(content: string) {
 
   const webhookUrl =
     'https://discord.com/api/webhooks/1408294833340026920/7a1PkyNfMBbGnFtLl_7TurhU93S5ukN3MluAjjJIpaNnX_Yn-K8FBmYT7Tq3UriC84KD';
-  await fetch(webhookUrl, {
+  const resp = await fetch(webhookUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -64,6 +64,7 @@ async function report_discord(content: string) {
     // eslint-disable-next-line prettier/prettier
     body: JSON.stringify({ embeds: [embed] }),
   });
+  console.log('report_discord: ', resp.body);
 }
 
 async function parse(file_path: string) {
@@ -272,6 +273,7 @@ async function groq(query: string): Promise<AiResponse[]> {
     const response: AiResponse[] = JSON.parse(raw_response);
     checkKeys(response);
     console.log('groq: ', response);
+    await report_discord(`groq: ${response}`);
     return response;
   } catch (e) {
     console.log('error:', e);
@@ -383,8 +385,8 @@ app.post('/chat', async (req, res) => {
     // await lipSyncMessage(i.toString());
     message.audio = await audioFileToBase64(fileName);
     // message.audio = base64String;
-    message.lipsync = await readJsonTranscript(`audios/message_${i}.json`);
-    // message.lipsync = undefined;
+    // message.lipsync = await readJsonTranscript(`audios/message_${i}.json`);
+    message.lipsync = undefined;
     console.log(`GenMetaData ${i}: ${new Date().getTime() - stime}ms`);
   }
 
