@@ -55,7 +55,7 @@ async function report_discord(content: string) {
   });
 
   const webhookUrl =
-    'https://discord.com/api/webhooks/1404753369523818496/gYWrWWylGmIP8vR1y81Km6fGNxzZGwPmlykdQ9ATjWynwtGNZda5GKbqaUFMNH90ILWS';
+    'https://discord.com/api/webhooks/1408294833340026920/7a1PkyNfMBbGnFtLl_7TurhU93S5ukN3MluAjjJIpaNnX_Yn-K8FBmYT7Tq3UriC84KD';
   await fetch(webhookUrl, {
     method: 'POST',
     headers: {
