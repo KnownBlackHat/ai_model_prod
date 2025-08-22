@@ -1,12 +1,12 @@
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import axios from 'axios';
 import wiki from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import {promises as fs} from 'fs';
-import {GoogleGenerativeAI} from '@google/generative-ai';
+import { promises as fs } from 'fs';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
 interface AiResponse {
@@ -19,7 +19,7 @@ interface AiResponse {
 const CONTEXT_FILE = 'context.json';
 // const voiceID = '9BWtsMINqrJLrRacOk9x';
 const voiceID = 'p364';
-const groq_agent = new Groq({apiKey: process.env.GROQ_API_KEY});
+const groq_agent = new Groq({ apiKey: process.env.GROQ_API_KEY });
 dotenv.config();
 
 // function arrayBufferToBase64(buffer: ArrayBuffer) {
@@ -33,6 +33,38 @@ dotenv.config();
 
 //   return btoa(binary);
 // }
+
+interface Embeds {
+  name: String;
+  value: String;
+  inline: Boolean;
+}
+
+async function report_discord(content: string) {
+  const embed = {
+    title: 'Ai_Model Log',
+    color: 0xff0000,
+    timestamp: new Date().toISOString(),
+    fields: [] as Embeds[],
+  };
+
+  embed.fields.push({
+    name: 'Log',
+    value: `\`\`\`${content}\`\`\``,
+    inline: false,
+  });
+
+  const webhookUrl =
+    'https://discord.com/api/webhooks/1404753369523818496/gYWrWWylGmIP8vR1y81Km6fGNxzZGwPmlykdQ9ATjWynwtGNZda5GKbqaUFMNH90ILWS';
+  await fetch(webhookUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // eslint-disable-next-line prettier/prettier
+    body: JSON.stringify({ embeds: [embed] }),
+  });
+}
 
 async function parse(file_path: string) {
   const data = await fs.readFile(file_path);
@@ -243,6 +275,7 @@ async function groq(query: string): Promise<AiResponse[]> {
     return response;
   } catch (e) {
     console.log('error:', e);
+    await report_discord(`error: ${e}`);
     return [
       {
         text: 'Sorry i was not able to hear you, could you please repeat your query!',
@@ -272,8 +305,8 @@ async function gemini_chat(query: string): Promise<AiResponse[]> {
       model: 'gemini-1.5-pro-002',
       systemInstruction: `
       You are a chat bot of galgotias university who provides details about an event taking place in our college.
-        take recent info from context given. don't include * in text or any emoji, and be formal
-        You will always reply with a JSON array of messages. With a maximum of 2 messages. and don't quote it with \`\`\`json and message should be concise
+        take recent info from context given.don't include * in text or any emoji, and be formal
+        You will always reply with a JSON array of messages.With a maximum of 2 messages.and don't quote it with \`\`\`json and message should be concise
         Each message has a text, facialExpression, and animation property.
         The different facial expressions are: smile, sad, angry, surprised, funnyFace, and default.
         The different animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
@@ -284,12 +317,12 @@ async function gemini_chat(query: string): Promise<AiResponse[]> {
       history: jsonctx,
     });
     const result = await chat.sendMessage(query);
-    console.log(`gemini: ${result.response.text()}`);
+    console.log(`gemini: ${result.response.text()} `);
     resp = JSON.parse(result.response.text());
   } catch (e) {
     console.error('gemini_chat func: ', e);
     resp = await wikipedia(query);
-    console.log(`wiki: ${JSON.stringify(resp)}`);
+    console.log(`wiki: ${JSON.stringify(resp)} `);
   }
   return resp;
 }
@@ -310,7 +343,7 @@ const execCommand = (command: string) => {
 
 const lipSyncMessage = async (message: string) => {
   await execCommand(
-    `./bin/rhubarb -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`,
+    `./ bin / rhubarb - f json - o audios / message_${message}.json audios / message_${message}.wav - r phonetic`,
   );
   // -r phonetic is faster but less accurate
 };
@@ -330,7 +363,7 @@ app.post('/chat', async (req, res) => {
 
   let stime = new Date().getTime();
   const messages: AiResponse[] = await groq(userMessage);
-  console.log(`LLM: ${new Date().getTime() - stime}ms`);
+  console.log(`LLM: ${new Date().getTime() - stime} ms`);
   async function genmetadata(i: number) {
     const stime = new Date().getTime();
     const message = messages[i];
@@ -363,7 +396,7 @@ app.post('/chat', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({messages});
+  res.send({ messages });
 });
 
 const readJsonTranscript = async (file: string) => {
