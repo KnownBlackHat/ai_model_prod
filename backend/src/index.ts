@@ -380,7 +380,7 @@ app.post('/chat', async (req, res) => {
     // const arrayBuffer = await blob.arrayBuffer();
     // const base64String = arrayBufferToBase64(arrayBuffer);
 
-    await lipSyncMessage(i.toString());
+    // await lipSyncMessage(i.toString());
     message.audio = await audioFileToBase64(fileName);
     // message.audio = base64String;
     message.lipsync = await readJsonTranscript(`audios/message_${i}.json`);

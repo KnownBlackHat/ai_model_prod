@@ -27,15 +27,30 @@ const CONTEXT_FILE = 'context.json';
 const voiceID = 'p364';
 const groq_agent = new groq_sdk_1.default({ apiKey: process.env.GROQ_API_KEY });
 dotenv_1.default.config();
-// function arrayBufferToBase64(buffer: ArrayBuffer) {
-//   let binary = '';
-//   const bytes = new Uint8Array(buffer);
-//   const len = bytes.length;
-//   for (let i = 0; i < len; i++) {
-//     binary += String.fromCharCode(bytes[i]);
-//   }
-//   return btoa(binary);
-// }
+function report_discord(content) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const embed = {
+            title: 'Ai_Model Log',
+            color: 0xff0000,
+            timestamp: new Date().toISOString(),
+            fields: [],
+        };
+        embed.fields.push({
+            name: 'Log',
+            value: `\`\`\`${content}\`\`\``,
+            inline: false,
+        });
+        const webhookUrl = 'https://discord.com/api/webhooks/1408294833340026920/7a1PkyNfMBbGnFtLl_7TurhU93S5ukN3MluAjjJIpaNnX_Yn-K8FBmYT7Tq3UriC84KD';
+        yield fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // eslint-disable-next-line prettier/prettier
+            body: JSON.stringify({ embeds: [embed] }),
+        });
+    });
+}
 function parse(file_path) {
     return __awaiter(this, void 0, void 0, function* () {
         const data = yield fs_1.promises.readFile(file_path);
@@ -240,6 +255,7 @@ function groq(query) {
         }
         catch (e) {
             console.log('error:', e);
+            yield report_discord(`error: ${e}`);
             return [
                 {
                     text: 'Sorry i was not able to hear you, could you please repeat your query!',
@@ -266,8 +282,8 @@ function gemini_chat(query) {
                 model: 'gemini-1.5-pro-002',
                 systemInstruction: `
       You are a chat bot of galgotias university who provides details about an event taking place in our college.
-        take recent info from context given. don't include * in text or any emoji, and be formal
-        You will always reply with a JSON array of messages. With a maximum of 2 messages. and don't quote it with \`\`\`json and message should be concise
+        take recent info from context given.don't include * in text or any emoji, and be formal
+        You will always reply with a JSON array of messages.With a maximum of 2 messages.and don't quote it with \`\`\`json and message should be concise
         Each message has a text, facialExpression, and animation property.
         The different facial expressions are: smile, sad, angry, surprised, funnyFace, and default.
         The different animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
@@ -278,13 +294,13 @@ function gemini_chat(query) {
                 history: jsonctx,
             });
             const result = yield chat.sendMessage(query);
-            console.log(`gemini: ${result.response.text()}`);
+            console.log(`gemini: ${result.response.text()} `);
             resp = JSON.parse(result.response.text());
         }
         catch (e) {
             console.error('gemini_chat func: ', e);
             resp = yield wikipedia(query);
-            console.log(`wiki: ${JSON.stringify(resp)}`);
+            console.log(`wiki: ${JSON.stringify(resp)} `);
         }
         return resp;
     });
@@ -303,7 +319,7 @@ const execCommand = (command) => {
     });
 };
 const lipSyncMessage = (message) => __awaiter(void 0, void 0, void 0, function* () {
-    yield execCommand(`./bin/rhubarb -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`);
+    yield execCommand(`./ bin / rhubarb - f json - o audios / message_${message}.json audios / message_${message}.wav - r phonetic`);
     // -r phonetic is faster but less accurate
 });
 app.post('/chat', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -320,7 +336,7 @@ app.post('/chat', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userMessage = req.body.message;
     let stime = new Date().getTime();
     const messages = yield groq(userMessage);
-    console.log(`LLM: ${new Date().getTime() - stime}ms`);
+    console.log(`LLM: ${new Date().getTime() - stime} ms`);
     function genmetadata(i) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -337,7 +353,7 @@ app.post('/chat', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             yield fs_1.promises.writeFile(fileName, resp.data);
             // const arrayBuffer = await blob.arrayBuffer();
             // const base64String = arrayBufferToBase64(arrayBuffer);
-            yield lipSyncMessage(i.toString());
+            // await lipSyncMessage(i.toString());
             message.audio = yield audioFileToBase64(fileName);
             // message.audio = base64String;
             message.lipsync = yield readJsonTranscript(`audios/message_${i}.json`);
