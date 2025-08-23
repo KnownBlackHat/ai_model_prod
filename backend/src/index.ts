@@ -1,7 +1,7 @@
 import {exec} from 'child_process';
 import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import axios from 'axios';
-import wiki from 'wikipedia';
+import wiki, {content} from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -9,6 +9,12 @@ import express from 'express';
 import {promises as fs} from 'fs';
 import {GoogleGenerativeAI} from '@google/generative-ai';
 import Groq from 'groq-sdk';
+
+import {Db, MongoClient} from 'mongodb';
+import {
+  ChatCompletionMessage,
+  ChatCompletionMessageParam,
+} from 'groq-sdk/resources/chat/completions';
 
 interface AiResponse {
   text?: string;
@@ -21,6 +27,22 @@ const CONTEXT_FILE = 'context.json';
 // const voiceID = '9BWtsMINqrJLrRacOk9x';
 const voiceID = 'p364';
 const groq_agent = new Groq({apiKey: process.env.GROQ_API_KEY});
+
+const url = process.env.MONGO_URL;
+if (!url) throw new Error('Mongo db url not found');
+
+const client = new MongoClient(url);
+let db: Db | null = null;
+
+async function run() {
+  try {
+    await client.connect();
+    db = client.db('ai_chat_history');
+  } catch (err) {
+    console.log((err as Error).stack);
+  }
+}
+
 dotenv.config();
 
 // function arrayBufferToBase64(buffer: ArrayBuffer) {
@@ -80,64 +102,6 @@ async function parse(file_path: string) {
   return parsed;
 }
 
-function generateRandomLine() {
-  const lines = [
-    {
-      text: 'Hi, I’m Millie. I provide information about the Galgotias tech council and upcoming events and activities.',
-      facialExpression: 'default',
-      animation: 'Talking_0',
-    },
-    {
-      text: 'Hello, I’m Millie. I’m here to assist you with details about the Galgotias tech council and upcoming fests.',
-      facialExpression: 'default',
-      animation: 'Talking_1',
-    },
-    {
-      text: 'Hi, I’m Millie. I’m designed to help with university-related queries.',
-      facialExpression: 'default',
-      animation: 'Talking_2',
-    },
-    {
-      text: 'Hello, I’m Millie. I offer real-time information on the Galgotias tech council and events.',
-      facialExpression: 'default',
-      animation: 'Talking_0',
-    },
-    {
-      text: 'Hi, I’m Millie. I’m here to provide quick, accurate answers regarding university activities.',
-      facialExpression: 'smile',
-      animation: 'Talking_1',
-    },
-    {
-      text: 'Hello, I’m Millie. I assist with inquiries related to Galgotias’s upcoming fests and initiatives.',
-      facialExpression: 'default',
-      animation: 'Talking_2',
-    },
-    {
-      text: 'Hi, I’m Millie. I provide detailed responses about university events, fests, and more.',
-      facialExpression: 'surprised',
-      animation: 'Talking_0',
-    },
-    {
-      text: 'Hello, I’m Millie. I’m your go-to for any information regarding Galgotias functions and events.',
-      facialExpression: 'smile',
-      animation: 'Talking_1',
-    },
-    {
-      text: 'Hi, I’m Millie. I’m designed to assist with queries related to Galgotias’s activities and fests.',
-      facialExpression: 'default',
-      animation: 'Talking_2',
-    },
-    {
-      text: 'Hello, I’m Millie. I provide accessible, real-time answers about the university’s events and initiatives.',
-      facialExpression: 'smile',
-      animation: 'Talking_0',
-    },
-  ];
-
-  const randomIndex = Math.floor(Math.random() * lines.length);
-  return lines[randomIndex];
-}
-
 async function wikipedia(query: string): Promise<AiResponse[]> {
   let resp: AiResponse[];
   try {
@@ -189,10 +153,6 @@ function checkKeys(response: AiResponse[]) {
 
 async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
   console.log(`user: ${request.prompt}`);
-  if (request.prompt.includes('intro') && request.prompt.includes('yourself')) {
-    console.log(`Auto response: ${request.prompt}`);
-    return [generateRandomLine()];
-  }
   try {
     const response = await axios.post(
       `${process.env.OLLAMA_SERVER}/api/generate`,
@@ -231,7 +191,34 @@ async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
   }
 }
 
-async function groq(query: string): Promise<AiResponse[]> {
+interface Dblist {
+  date: number;
+  user: string;
+  assistant: string;
+}
+
+function history_builder(dblist: Dblist[]): ChatCompletionMessageParam[] {
+  const response: ChatCompletionMessageParam[] = [];
+  for (const dbent of dblist) {
+    response.push({
+      role: 'user',
+      content: dbent.user,
+    });
+    response.push({
+      role: 'assistant',
+      content: dbent.assistant,
+    });
+  }
+  return response;
+}
+
+async function groq(query: string, id = 1): Promise<AiResponse[]> {
+  if (!db) {
+    throw new Error('Unable to get db');
+  }
+  const col = db.collection(`his-${id}`);
+  const history = await col.find({}).sort({_id: -1}).limit(20).toArray();
+  const obj = history_builder(history as unknown as Dblist[]);
   const completion = await groq_agent.chat.completions.create({
     messages: [
       {
@@ -288,6 +275,7 @@ async function groq(query: string): Promise<AiResponse[]> {
         ]
         `,
       },
+      ...obj,
       {
         role: 'user',
         content: query,
@@ -302,6 +290,11 @@ async function groq(query: string): Promise<AiResponse[]> {
     checkKeys(response);
     console.log('groq: ', response);
     await report_discord(query, JSON.stringify(response), false);
+    await col.insertOne({
+      date: Date.now(),
+      user: query,
+      assistant: JSON.stringify(response),
+    });
     return response;
   } catch (e) {
     console.log('error:', e);
@@ -330,10 +323,6 @@ async function gemini_chat(query: string): Promise<AiResponse[]> {
   }
 
   console.log(`user: ${query}`);
-
-  if (query.includes('intro') && query.includes('yourself')) {
-    return [generateRandomLine()];
-  }
 
   let resp: AiResponse[];
 
@@ -447,6 +436,7 @@ const audioFileToBase64 = async (file: string) => {
   return data.toString('base64');
 };
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Backend on port ${port}`);
+  await run();
 });

@@ -46,6 +46,7 @@ services:
     environment:
       - OLLAMA_SERVER=http://192.168.0.104:11434
       - GROQ_API_KEY=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
+      - MONGO_URL=mongodb+srv://test:test@cluster0.yvlq9mj.mongodb.net/
 
 
     depends_on:
