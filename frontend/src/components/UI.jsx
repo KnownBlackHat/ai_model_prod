@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "../hooks/useChat";
 import { FaMicrophoneAlt, FaMicrophoneAltSlash, FaBars } from "react-icons/fa";
+import { TbHistory } from "react-icons/tb";
+import { TbHistoryOff } from "react-icons/tb";
 import { IoSendSharp } from "react-icons/io5";
 import CompanyLogo from "../assets/cybergenix.png";
 import { motion, AnimatePresence } from "framer-motion";
@@ -153,17 +155,19 @@ export const UI = ({ hidden, meta_ui }) => {
                 <div
                     className="pointer-events-auto bg-black/70 flex justify-between text-white p-3 rounded-xl shadow-lg  transition-all"
                 >
-                    <button
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                    >
-                        <FaBars size={22} />
-                    </button>
-                    <button
-                        onClick={() => setToggleContextHistory(prev => !prev)}
-                        className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-2 rounded-xl ml-4"
-                    >
-                        {toggleContextHistory ? "Hide History" : "Show History"}
-                    </button>
+                    <div>
+                        <button
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                        >
+                            <FaBars size={22} />
+                        </button>
+                        <button
+                            onClick={() => setToggleContextHistory(prev => !prev)}
+                            className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-2 rounded-xl ml-4 text-xl"
+                        >
+                            {toggleContextHistory ? <TbHistoryOff /> : <TbHistory />}
+                        </button>
+                    </div>
                     <button
                         onClick={() => window.location.href = "https://forms.gle/3c8m9bTjW7v4kW5f9"}
                         className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-3 rounded-xl transition-all"
@@ -261,16 +265,52 @@ export const UI = ({ hidden, meta_ui }) => {
                             </button>
                         )}
                     </div>
+                    <div className="flex items-center justify-center mt-6">
+                        <div className="relative inline-block">
+                            {/* Button Background */}
+                            <div className="px-8 py-3 rounded-2xl bg-black/60 text-blue-200 font-medium relative z-10">
+                                Upgrade Your Plan
+                            </div>
 
-                    <div className="flex items-center justify-center">
-                        <div className="relative z-10 bg-black/80 px-5 py-2 rounded-2xl border border-yellow-400 mt-2
-                   text-yellow-200 font-medium
-                   shadow-[0_0_6px_#fde047,0_0_14px_#facc15,0_0_28px_#f59e0b]
-                   hover:shadow-[0_0_10px_#fde047,0_0_20px_#facc15,0_0_36px_#f59e0b]
-                   transition-shadow">
-                            Upgrade Your Plan
+                            {/* Laser Border Overlay */}
+                            <svg
+                                className="absolute top-0 left-0 w-full h-full pointer-events-none z-20"
+                                viewBox="0 0 240 70"
+                                preserveAspectRatio="none"
+                            >
+                                <rect
+                                    x="2"
+                                    y="2"
+                                    width="236"
+                                    height="66"
+                                    rx="16"
+                                    ry="16"
+                                    fill="none"
+                                    stroke="url(#blueLaser)"
+                                    strokeWidth="3"
+                                    strokeDasharray="120 600"
+                                    strokeDashoffset="0"
+                                >
+                                    <animate
+                                        attributeName="stroke-dashoffset"
+                                        from="0"
+                                        to="-660"
+                                        dur="2s"
+                                        repeatCount="indefinite"
+                                    />
+                                </rect>
+
+                                <defs>
+                                    <linearGradient id="blueLaser" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" stopColor="#3b82f6" />
+                                        <stop offset="50%" stopColor="#60a5fa" />
+                                        <stop offset="100%" stopColor="#2563eb" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
                         </div>
                     </div>
+
                 </div>
             </div>
         </>
