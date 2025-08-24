@@ -20,7 +20,6 @@ export const UI = ({ hidden, meta_ui }) => {
 
     useEffect(() => {
         if (message) {
-            console.log("msg: ", JSON.stringify(message))
             setChatHistory(his => [
                 ...his,
                 {
@@ -75,7 +74,6 @@ export const UI = ({ hidden, meta_ui }) => {
 
         window.rec.onresult = (e) => {
             speech = Array.from(e.results).map((result) => result[0].transcript).join("");
-            console.log(speech);
             meta_ui.setAnimation("Listening_1");
         };
 
