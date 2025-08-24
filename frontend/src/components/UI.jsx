@@ -11,6 +11,7 @@ export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
     const [audioState, setaudioState] = useState("idle");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
     const { chat, loading, message } = useChat();
     const chatEndRef = useRef(null);
@@ -158,46 +159,54 @@ export const UI = ({ hidden, meta_ui }) => {
                         <FaBars size={22} />
                     </button>
                     <button
+                        onClick={() => setToggleContextHistory(prev => !prev)}
+                        className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-2 rounded-xl ml-4"
+                    >
+                        {toggleContextHistory ? "Hide History" : "Show History"}
+                    </button>
+                    <button
                         onClick={() => window.location.href = "https://forms.gle/3c8m9bTjW7v4kW5f9"}
                         className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-3 rounded-xl transition-all"
                     >
                         Get one for your business
                     </button>
                 </div>
-                <div ref={chatEndRef} className="bg-gray-900 opacity-90 border-blue-400 border-2 shadow-[0_0_5px_#60A5FA,0_0_5px_#60A5FA,0_0_10px_#3B82F6,0_0_30px_#2563EB]  h-[70%] w-[30%] fixed left-16 bottom-[15%] text-center rounded-xl overflow-scroll pointer-events-auto">
-                    <div className="mb-2 sticky top-0 bg-blue-800 border-b-2 border-white">
-                        Chat History
+                {toggleContextHistory &&
+                    <div ref={chatEndRef} className="bg-gray-900 opacity-90 border-blue-400 border-2 shadow-[0_0_5px_#60A5FA,0_0_5px_#60A5FA,0_0_10px_#3B82F6,0_0_30px_#2563EB]  h-[60%] w-[30%] fixed left-16 bottom-[20%] text-center rounded-xl overflow-scroll pointer-events-auto">
+                        <div className="text-white p-2 mb-2 sticky top-0 bg-blue-800 border-b-2 border-white">
+                            Chat History
+                        </div>
+
+                        {chatHistory.map((item) => {
+                            return <>
+                                {item.user &&
+                                    <div className="flex text-white justify-between overflow-scroll">
+                                        <div className="text-right m-2 bg-slate-800" />
+                                        <div className="text-right m-2 bg-slate-700 p-2 rounded-lg flex-col">
+                                            <div>
+                                                {item.user}
+                                            </div>
+                                            <div class="text-xs text-gray-400">
+                                                {(new Date(item.date)).getHours()}:
+                                                {(new Date(item.date)).getMinutes()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                {item.assistant &&
+                                    <div className="flex justify-between text-white overflow-scroll ">
+                                        <div className="text-left m-2 bg-slate-700 p-2 rounded-lg">
+                                            {item.assistant && JSON.parse(item.assistant).map(item => item.text).join("\n")}
+                                        </div>
+                                        <div className="text-right m-2 bg-slate-800" />
+                                    </div>
+                                }
+                            </>
+                        })}
+
                     </div>
-
-                    {chatHistory.map((item) => {
-                        return <>
-                            {item.user &&
-                                <div className="flex justify-between overflow-scroll">
-                                    <div className="text-right m-2 bg-slate-800" />
-                                    <div className="text-right m-2 bg-slate-800 p-2 rounded-lg flex-col">
-                                        <div>
-                                            {item.user}
-                                        </div>
-                                        <div class="text-xs text-gray-400">
-                                            {(new Date(item.date)).getHours()}:
-                                            {(new Date(item.date)).getMinutes()}
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-
-                            {item.assistant &&
-                                <div className="flex justify-between overflow-scroll ">
-                                    <div className="text-left m-2 bg-slate-800 p-2 rounded-lg">
-                                        {item.assistant && JSON.parse(item.assistant).map(item => item.text).join("\n")}
-                                    </div>
-                                    <div className="text-right m-2 bg-slate-800" />
-                                </div>
-                            }
-                        </>
-                    })}
-
-                </div>
+                }
 
                 {/* Company Logo */}
                 <img src={CompanyLogo} alt="Company Logo"
@@ -254,10 +263,12 @@ export const UI = ({ hidden, meta_ui }) => {
                     </div>
 
                     <div className="flex items-center justify-center">
-                        <div className="bg-black/80 p-2 mt-4 rounded-xl border-blue-700 border-2 shadow-lg">
-                            <span className="text-gray-200 p-2 px-4 text-center m-2 rounded-full">
-                                Upgrade Your Plan
-                            </span>
+                        <div className="relative z-10 bg-black/80 px-5 py-2 rounded-2xl border border-yellow-400 mt-2
+                   text-yellow-200 font-medium
+                   shadow-[0_0_6px_#fde047,0_0_14px_#facc15,0_0_28px_#f59e0b]
+                   hover:shadow-[0_0_10px_#fde047,0_0_20px_#facc15,0_0_36px_#f59e0b]
+                   transition-shadow">
+                            Upgrade Your Plan
                         </div>
                     </div>
                 </div>
