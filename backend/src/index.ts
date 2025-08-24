@@ -1,20 +1,17 @@
-import { exec } from 'child_process';
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import {exec} from 'child_process';
+import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import axios from 'axios';
-import wiki, { content } from 'wikipedia';
+import wiki, {content} from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import { promises as fs } from 'fs';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {promises as fs} from 'fs';
+import {GoogleGenerativeAI} from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
-import { Db, MongoClient } from 'mongodb';
-import {
-  ChatCompletionMessage,
-  ChatCompletionMessageParam,
-} from 'groq-sdk/resources/chat/completions';
+import {Db, MongoClient} from 'mongodb';
+import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
 
 interface AiResponse {
   text?: string;
@@ -26,7 +23,7 @@ interface AiResponse {
 const CONTEXT_FILE = 'context.json';
 // const voiceID = '9BWtsMINqrJLrRacOk9x';
 const voiceID = 'p364';
-const groq_agent = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq_agent = new Groq({apiKey: process.env.GROQ_API_KEY});
 
 const url = process.env.MONGO_URL;
 if (!url) throw new Error('Mongo db url not found');
@@ -217,7 +214,7 @@ async function groq(query: string, id = 1): Promise<AiResponse[]> {
     throw new Error('Unable to get db');
   }
   const col = db.collection(`his-${id}`);
-  const history = await col.find({}).sort({ _id: -1 }).limit(20).toArray();
+  const history = await col.find({}).sort({_id: -1}).limit(20).toArray();
   const obj = history_builder(history as unknown as Dblist[]);
   const completion = await groq_agent.chat.completions.create({
     messages: [
@@ -378,6 +375,16 @@ const lipSyncMessage = async (message: string) => {
   // -r phonetic is faster but less accurate
 };
 
+app.get('/history/:id', async (req, res) => {
+  if (!db) {
+    res.send({error: 'db bot found'});
+  } else {
+    const col = db.collection(`his-${req.params.id}`);
+    const history = await col.find({}).sort({_id: 1}).toArray();
+    res.send(history);
+  }
+});
+
 app.post('/chat', async (req, res) => {
   /*
       This endpoint returns response like following
@@ -426,7 +433,7 @@ app.post('/chat', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({ messages });
+  res.send({messages});
 });
 
 const readJsonTranscript = async (file: string) => {

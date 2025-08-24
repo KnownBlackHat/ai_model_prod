@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat } from "../hooks/useChat";
 import { FaMicrophoneAlt, FaMicrophoneAltSlash, FaBars } from "react-icons/fa";
 import { IoSendSharp } from "react-icons/io5";
@@ -11,7 +11,38 @@ export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
     const [audioState, setaudioState] = useState("idle");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [chatHistory, setChatHistory] = useState([]);
     const { chat, loading, message } = useChat();
+    const chatEndRef = useRef(null);
+
+    useEffect(() => {
+        if (message) {
+            console.log("msg: ", JSON.stringify(message))
+            setChatHistory(his => [
+                ...his,
+                {
+                    date: Date.now(),
+                    user: null,
+                    assistant: JSON.stringify([message])
+                }
+            ]);
+        }
+    }, [message]);
+
+    useEffect(() => {
+        if (chatEndRef.current) {
+            chatEndRef.current.scrollTop = chatEndRef.current.scrollHeight;
+        }
+    }, [chatHistory]);
+
+    useEffect(() => {
+        async function load_data() {
+            const resp = await fetch('http://localhost:3000/history/1');
+            const json_resp = await resp.json()
+            setChatHistory(json_resp);
+        };
+        load_data();
+    }, []);
 
     const MicStop = () => {
         window.micd = true;
@@ -63,8 +94,21 @@ export const UI = ({ hidden, meta_ui }) => {
     const sendMessage = () => {
         meta_ui.setAnimation("Thinking_0");
         const text = input.current.value;
-        if (!loading && !message) {
+
+        if (!loading && !message && text.trim() !== "") {
+            // send to backend
             chat(text);
+
+            // append user message
+            setChatHistory(his => [
+                ...his,
+                {
+                    date: Date.now(),
+                    user: text,
+                    assistant: null
+                }
+            ]);
+
             input.current.value = "";
         }
     };
@@ -119,6 +163,40 @@ export const UI = ({ hidden, meta_ui }) => {
                     >
                         Get one for your business
                     </button>
+                </div>
+                <div ref={chatEndRef} className="bg-gray-900 opacity-90 border-blue-400 border-2 shadow-[0_0_5px_#60A5FA,0_0_5px_#60A5FA,0_0_10px_#3B82F6,0_0_30px_#2563EB]  h-[70%] w-[30%] fixed left-16 bottom-[15%] text-center rounded-xl overflow-scroll pointer-events-auto">
+                    <div className="mb-2 sticky top-0 bg-blue-800 border-b-2 border-white">
+                        Chat History
+                    </div>
+
+                    {chatHistory.map((item) => {
+                        return <>
+                            {item.user &&
+                                <div className="flex justify-between overflow-scroll">
+                                    <div className="text-right m-2 bg-slate-800" />
+                                    <div className="text-right m-2 bg-slate-800 p-2 rounded-lg flex-col">
+                                        <div>
+                                            {item.user}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            {(new Date(item.date)).getHours()}:
+                                            {(new Date(item.date)).getMinutes()}
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            {item.assistant &&
+                                <div className="flex justify-between overflow-scroll ">
+                                    <div className="text-left m-2 bg-slate-800 p-2 rounded-lg">
+                                        {item.assistant && JSON.parse(item.assistant).map(item => item.text).join("\n")}
+                                    </div>
+                                    <div className="text-right m-2 bg-slate-800" />
+                                </div>
+                            }
+                        </>
+                    })}
+
                 </div>
 
                 {/* Company Logo */}
