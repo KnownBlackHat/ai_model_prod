@@ -1,17 +1,17 @@
-import { exec } from 'child_process';
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import {exec} from 'child_process';
+import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import axios from 'axios';
-import wiki, { content } from 'wikipedia';
+import wiki, {content} from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import { promises as fs } from 'fs';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {promises as fs} from 'fs';
+import {GoogleGenerativeAI} from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
-import { Db, MongoClient } from 'mongodb';
-import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
+import {Db, MongoClient} from 'mongodb';
+import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
 
 interface AiResponse {
   text?: string;
@@ -50,7 +50,7 @@ async function streamToBase64(stream: ReadableStream) {
   const chunks = [];
 
   let done, value;
-  while ((({ done, value } = await reader.read()), !done)) {
+  while ((({done, value} = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -245,7 +245,7 @@ async function groq(query: string, id = 1): Promise<AiResponse[]> {
     throw new Error('Unable to get db');
   }
   const col = db.collection(`his-${id}`);
-  const history = await col.find({}).sort({ _id: -1 }).limit(20).toArray();
+  const history = await col.find({}).sort({_id: -1}).limit(20).toArray();
   history.reverse();
   const obj = history_builder(history as unknown as Dblist[]);
   console.log(obj);
@@ -254,7 +254,7 @@ async function groq(query: string, id = 1): Promise<AiResponse[]> {
       {
         role: 'system',
         content: `
-        You are ai assistant named Niva at Cybergenix private limited.
+        You are female ai assistant named Niva at Cybergenix private limited.
         Use a formal tone, avoiding asterisks or emojis.
         Respond with a JSON array containing up to two messages, each with a text, facialExpression, and animation property. Available facial expressions are: smile, sad, angry, surprised, funnyFace, and default. Available animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
         Respond accordingly and provide a json output containing following keys:
@@ -410,10 +410,10 @@ const lipSyncMessage = async (message: string) => {
 
 app.get('/history/:id', async (req, res) => {
   if (!db) {
-    res.send({ error: 'db bot found' });
+    res.send({error: 'db bot found'});
   } else {
     const col = db.collection(`his-${req.params.id}`);
-    const history = await col.find({}).sort({ _id: 1 }).toArray();
+    const history = await col.find({}).sort({_id: 1}).toArray();
     res.send(history);
   }
 });
@@ -466,7 +466,7 @@ app.post('/chat', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({ messages });
+  res.send({messages});
 });
 
 const readJsonTranscript = async (file: string) => {
