@@ -224,7 +224,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
                     <div className="flex justify-center items-center gap-2 pointer-events-auto max-w-screen-sm w-full mx-auto">
                         {audioState === "idle" && (
-                            <input
+                            <textarea
                                 className="w-full border-2 border-white placeholder:text-gray-500 placeholder:italic p-4 rounded-xl bg-white/20 text-white backdrop-blur-md focus:outline-none"
                                 placeholder="Ask from Niva..."
                                 ref={input}
