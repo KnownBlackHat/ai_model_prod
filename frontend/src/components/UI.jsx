@@ -39,7 +39,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     useEffect(() => {
         async function load_data() {
-            const resp = await fetch(`${process.env.VITE_BACKENDADDR}/history/1}`);
+            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/1}`);
             const json_resp = await resp.json()
             setChatHistory(json_resp);
         };
