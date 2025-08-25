@@ -21,8 +21,8 @@ interface AiResponse {
   lipsync?: string;
 }
 const CONTEXT_FILE = 'context.json';
-const voiceIDele = 'qBDvhofpxp92JgXJxDjB';
-const voiceID = 'p364';
+const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
+// const voiceID = 'p364';
 const groq_agent = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
