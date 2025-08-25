@@ -179,8 +179,8 @@ export const UI = ({ hidden, meta_ui }) => {
                             Chat History
                         </div>
 
-                        {chatHistory.map((item) => {
-                            return <>
+                        {chatHistory.map((item, idx) => {
+                            return <div key={idx}>
                                 {item.user &&
                                     <div className="flex text-white justify-between overflow-scroll">
                                         <div className="text-right m-2 bg-slate-800" />
@@ -188,7 +188,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                             <div>
                                                 {item.user}
                                             </div>
-                                            <div class="text-xs text-gray-400">
+                                            <div className="text-xs text-gray-400">
                                                 {(new Date(item.date)).getHours()}:
                                                 {(new Date(item.date)).getMinutes()}
                                             </div>
@@ -204,7 +204,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                         <div className="text-right m-2 bg-slate-800" />
                                     </div>
                                 }
-                            </>
+                            </div>
                         })}
 
                     </div>
