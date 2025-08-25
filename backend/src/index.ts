@@ -315,7 +315,7 @@ async function groq(query: string, id = 1): Promise<AiResponse[]> {
         content: query,
       },
     ],
-    model: 'llama-3.1-8b-instant',
+    model: 'openai/gpt-oss-120b',
     stop: ['```'],
   });
   const raw_response = completion.choices[0]?.message?.content || '';
@@ -439,12 +439,8 @@ app.post('/chat', async (req, res) => {
     const stime = new Date().getTime();
     const message = messages[i];
 
-    let msg_txt = message.text ?? ' ';
-    if (msg_txt.split(' ').length >= 30 && msg_txt.split('.').length > 1) {
-      msg_txt = `${msg_txt.split('.')[0]}. More details are in chat box`;
-    }
     const audio = await elevenlab.textToSpeech.convert(voiceIDele, {
-      text: msg_txt,
+      text: message.text ?? '',
       modelId: 'eleven_flash_v2_5',
       outputFormat: 'mp3_44100_128',
     });

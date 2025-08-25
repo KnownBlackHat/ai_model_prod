@@ -228,6 +228,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                 className="w-full border-2 border-white placeholder:text-gray-500 placeholder:italic p-4 rounded-xl bg-white/20 text-white backdrop-blur-md focus:outline-none"
                                 placeholder="Ask from Niva..."
                                 ref={input}
+                                maxLength={500}
                                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                             />
                         )}
