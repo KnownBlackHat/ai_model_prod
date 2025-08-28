@@ -15,7 +15,7 @@ export const UI = ({ hidden, meta_ui }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
-    const { chat, loading, message } = useChat();
+    const { chat, loading, message, chatId } = useChat();
     const chatEndRef = useRef(null);
 
     useEffect(() => {
@@ -39,7 +39,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     useEffect(() => {
         async function load_data() {
-            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/1`);
+            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/${chatId}`);
             const json_resp = await resp.json()
             setChatHistory(json_resp);
         };
@@ -176,7 +176,7 @@ export const UI = ({ hidden, meta_ui }) => {
                 {toggleContextHistory &&
                     <div ref={chatEndRef} className="bg-gray-900 opacity-90 border-blue-400 border-2 shadow-[0_0_5px_#60A5FA,0_0_5px_#60A5FA,0_0_10px_#3B82F6,0_0_30px_#2563EB]  h-[60%] w-[30%] fixed left-16 bottom-[20%] text-center rounded-xl overflow-scroll pointer-events-auto">
                         <div className="text-white p-2 mb-2 sticky top-0 bg-blue-800 border-b-2 border-white">
-                            Chat History
+                            Chat History-{chatId}
                         </div>
 
                         {chatHistory.map((item, idx) => {
@@ -216,11 +216,6 @@ export const UI = ({ hidden, meta_ui }) => {
 
                 {/* Chat UI */}
                 <div>
-                    <div className="flex items-center justify-center">
-                        <span className="text-white p-2 px-4 rounded-full text-center m-2 bg-black/70 text-xl mb-8 shadow-lg" id="caption">
-                            Captions....
-                        </span>
-                    </div>
 
                     <div className="flex justify-center items-center gap-2 pointer-events-auto max-w-screen-sm w-full mx-auto">
                         {audioState === "idle" && (

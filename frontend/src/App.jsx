@@ -4,13 +4,14 @@ import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
 import { Experience } from "./components/Experience";
 import { UI } from "./components/UI";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
-// https://prod.spline.design/SPIIV5uOhPCNalYB/scene.splinecode
-// https://prod.spline.design/TJ95vhU6CBg7fNbH/scene.splinecode
-// https://prod.spline.design/tThMznD1kxf94Avq/scene.splinecode
-// https://prod.spline.design/l54auptMlsPAQma5/scene.splinecode
+import { useParams } from 'react-router';
+import { useChat } from './hooks/useChat';
+
 function App() {
+    const { chatId, setChatId } = useChat();
+    const { webChatId } = useParams();
     const { animations } = useGLTF("/models/animations.glb");
     const [animation, setAnimation] = useState(
         animations.find((a) => a.name === "Idle") ? "Idle" : animations[0].name
@@ -19,17 +20,15 @@ function App() {
 
     const meta_ui = { animations, animation, setAnimation, facialExpression, setFacialExpression };
     const isMobile = window.screen.width < window.screen.height;
+    setChatId(webChatId);
 
     return (
         isMobile ? <>
             <div className='h-screen w-screen text-center flex items-center justify-center'>
                 This website isn't compatible with mobile view
             </div>
-        </> : <>
+        </> : webChatId === chatId && <>
             <Spline
-                // scene="https://prod.spline.design/SPIIV5uOhPCNalYB/scene.splinecode"
-                // scene="https://prod.spline.design/TJ95vhU6CBg7fNbH/scene.splinecode"
-                // scene="https://prod.spline.design/tThMznD1kxf94Avq/scene.splinecode"
                 scene="https://prod.spline.design/l54auptMlsPAQma5/scene.splinecode"
                 className="absolute object-cover w-full h-full bg-black"
             />

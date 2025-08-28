@@ -110,9 +110,7 @@ export function Avatar(props) {
         const audio = new Audio("data:audio/mp3;base64," + message.audio);
         audio.play();
         setAudio(audio);
-        window.document.querySelector("#caption").innerText = message.text
         audio.onended = () => {
-            window.document.querySelector("#caption").innerText = '';
             props.meta_ui.setAnimation("Idle");
             props.meta_ui.setFacialExpression("default")
             onMessagePlayed();

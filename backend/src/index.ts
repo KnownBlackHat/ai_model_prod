@@ -1,17 +1,17 @@
-import {exec} from 'child_process';
-import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
+import { exec } from 'child_process';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import axios from 'axios';
 import wiki from 'wikipedia';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins
-import {promises as fs} from 'fs';
-import {GoogleGenerativeAI} from '@google/generative-ai';
+import { promises as fs } from 'fs';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
-import {Db, MongoClient} from 'mongodb';
-import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
+import { Db, MongoClient } from 'mongodb';
+import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
 
 interface AiResponse {
   text?: string;
@@ -50,7 +50,7 @@ async function streamToBase64(stream: ReadableStream) {
   const chunks = [];
 
   let done, value;
-  while ((({done, value} = await reader.read()), !done)) {
+  while ((({ done, value } = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -240,12 +240,12 @@ function history_builder(dblist: Dblist[]): ChatCompletionMessageParam[] {
   return response;
 }
 
-async function groq(query: string, id = 1): Promise<AiResponse[]> {
+async function groq(query: string, id = '1'): Promise<AiResponse[]> {
   if (!db) {
     throw new Error('Unable to get db');
   }
   const col = db.collection(`his-${id}`);
-  const history = await col.find({}).sort({_id: -1}).limit(20).toArray();
+  const history = await col.find({}).sort({ _id: -1 }).limit(20).toArray();
   history.reverse();
   const obj = history_builder(history as unknown as Dblist[]);
   console.log(obj);
@@ -341,7 +341,7 @@ async function groq(query: string, id = 1): Promise<AiResponse[]> {
       `,
       true,
     );
-    return groq(query); // RISKY CODE
+    return groq(query, id); // RISKY CODE
     return [
       {
         text: 'Sorry i was not able to hear you, could you please repeat your query!',
@@ -412,15 +412,22 @@ const lipSyncMessage = async (message: string) => {
 
 app.get('/history/:id', async (req, res) => {
   if (!db) {
-    res.send({error: 'db bot found'});
+    res.send({
+      error: 'db bot found',
+    });
   } else {
     const col = db.collection(`his-${req.params.id}`);
-    const history = await col.find({}).sort({_id: 1}).toArray();
+    const history = await col
+      .find({})
+      .sort({
+        _id: 1,
+      })
+      .toArray();
     res.send(history);
   }
 });
 
-app.post('/chat', async (req, res) => {
+app.post('/chat/:id', async (req, res) => {
   /*
       This endpoint returns response like following
     {
@@ -434,7 +441,7 @@ app.post('/chat', async (req, res) => {
   const userMessage = req.body.message;
 
   let stime = new Date().getTime();
-  const messages: AiResponse[] = await groq(userMessage);
+  const messages: AiResponse[] = await groq(userMessage, req.params.id);
   console.log(`LLM: ${new Date().getTime() - stime} ms`);
   async function genmetadata(i: number) {
     const stime = new Date().getTime();
@@ -464,7 +471,7 @@ app.post('/chat', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({messages});
+  res.send({ messages });
 });
 
 const readJsonTranscript = async (file: string) => {

@@ -7,7 +7,7 @@ const ChatContext = createContext();
 export const ChatProvider = ({ children }) => {
     const chat = async (message) => {
         setLoading(false);
-        const data = await fetch(`${backendUrl}/chat`, {
+        const data = await fetch(`${backendUrl}/chat/${chatId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -22,6 +22,7 @@ export const ChatProvider = ({ children }) => {
     const [message, setMessage] = useState();
     const [loading, setLoading] = useState(false);
     const [cameraZoomed, setCameraZoomed] = useState(true);
+    const [chatId, setChatId] = useState(0);
     const onMessagePlayed = () => {
         setMessages((messages) => messages.slice(1));
     };
@@ -44,6 +45,8 @@ export const ChatProvider = ({ children }) => {
                 loading,
                 cameraZoomed,
                 setCameraZoomed,
+                chatId,
+                setChatId
             }}
         >
             {children}
