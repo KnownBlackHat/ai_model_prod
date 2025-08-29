@@ -130,7 +130,11 @@ export const UI = ({ hidden, meta_ui }) => {
     };
 
     async function sendMessage() {
-        if (chatId === 0) await handleChatCreation(true);
+        if (chatId === 0) {
+            await handleChatCreation(true);
+            return null;
+        }
+
         meta_ui.setAnimation("Thinking_0");
         const text = input.current.value;
 
