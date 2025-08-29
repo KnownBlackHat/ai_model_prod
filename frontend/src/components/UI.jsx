@@ -229,7 +229,7 @@ export const UI = ({ hidden, meta_ui }) => {
                 {toggleContextHistory &&
                     <div ref={chatEndRef} className="bg-gray-900 opacity-90 border-blue-400 border-2 shadow-[0_0_5px_#60A5FA,0_0_5px_#60A5FA,0_0_10px_#3B82F6,0_0_30px_#2563EB]  h-[60%] w-[30%] fixed left-16 bottom-[20%] text-center rounded-xl overflow-scroll pointer-events-auto">
                         <div className="text-white p-2 mb-2 sticky top-0 bg-blue-800 border-b-2 border-white">
-                            Chat History-{chatId}
+                            Chat History
                         </div>
 
                         {chatHistory.map((item, idx) => {
