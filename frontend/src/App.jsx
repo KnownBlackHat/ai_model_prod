@@ -10,7 +10,7 @@ import { useParams } from 'react-router';
 import { useChat } from './hooks/useChat';
 
 function App() {
-    const { chatId, setChatId } = useChat();
+    const { chatId, setChatId } = useChat(0);
     const { webChatId } = useParams();
     const { animations } = useGLTF("/models/animations.glb");
     const [animation, setAnimation] = useState(
@@ -20,14 +20,14 @@ function App() {
 
     const meta_ui = { animations, animation, setAnimation, facialExpression, setFacialExpression };
     const isMobile = window.screen.width < window.screen.height;
-    setChatId(webChatId);
+    setChatId(webChatId ?? 0);
 
     return (
         isMobile ? <>
             <div className='h-screen w-screen text-center flex items-center justify-center'>
                 This website isn't compatible with mobile view
             </div>
-        </> : webChatId === chatId && <>
+        </> : (webChatId ?? 0) === chatId && <>
             <Spline
                 scene="https://prod.spline.design/l54auptMlsPAQma5/scene.splinecode"
                 className="absolute object-cover w-full h-full bg-black"

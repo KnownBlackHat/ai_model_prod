@@ -7,6 +7,16 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 let router = createBrowserRouter([
     {
+        path: "/chat",
+        element: (
+            <React.StrictMode>
+                <ChatProvider>
+                    <App />
+                </ChatProvider>
+            </React.StrictMode>
+        ),
+    },
+    {
         path: "/chat/:webChatId",
         element: (
             <React.StrictMode>

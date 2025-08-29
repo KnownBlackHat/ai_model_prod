@@ -6,6 +6,9 @@ import { TbHistoryOff } from "react-icons/tb";
 import { IoSendSharp } from "react-icons/io5";
 import CompanyLogo from "../assets/cybergenix.png";
 import { motion, AnimatePresence } from "framer-motion";
+import { IoMdAddCircleOutline } from "react-icons/io";
+import { Link, redirect, useNavigate } from "react-router";
+
 
 const WAKE_WORD = ["niva", " va ", "liva"];
 
@@ -16,7 +19,40 @@ export const UI = ({ hidden, meta_ui }) => {
     const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
     const { chat, loading, message, chatId } = useChat();
+    const [chatIds, setChatIds] = useState([]);
     const chatEndRef = useRef(null);
+    const navigate = useNavigate();
+
+    async function handleChatCreation(store = false) {
+        const resp = await fetch(
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids/create`
+        )
+        const res = await resp.json();
+        setChatIds(ids => [...ids, res.id]);
+        if (store) {
+            window.localStorage.setItem("route_his", input.current.value);
+        }
+        navigate(`/chat/${res.id}`);
+    }
+
+    useEffect(() => {
+        async function main() {
+            const resp = await fetch(
+                `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`
+            )
+            const res = await resp.json()
+            setChatIds(res)
+
+            const route_his = window.localStorage.getItem("route_his");
+            if (route_his) {
+                window.localStorage.removeItem("route_his");
+                input.current.value = route_his;
+                await sendMessage();
+            }
+        }
+
+        main();
+    }, [])
 
     useEffect(() => {
         if (message) {
@@ -43,7 +79,8 @@ export const UI = ({ hidden, meta_ui }) => {
             const json_resp = await resp.json()
             setChatHistory(json_resp);
         };
-        load_data();
+        if (chatId !== 0) load_data();
+
     }, []);
 
     const MicStop = () => {
@@ -92,15 +129,14 @@ export const UI = ({ hidden, meta_ui }) => {
         });
     };
 
-    const sendMessage = () => {
+    async function sendMessage() {
+        if (chatId === 0) await handleChatCreation(true);
         meta_ui.setAnimation("Thinking_0");
         const text = input.current.value;
 
         if (!loading && !message && text.trim() !== "") {
-            // send to backend
             chat(text);
 
-            // append user message
             setChatHistory(his => [
                 ...his,
                 {
@@ -133,11 +169,28 @@ export const UI = ({ hidden, meta_ui }) => {
                         animate={{ x: 0, opacity: 1 }}
                         exit={{ x: -300, opacity: 0 }}
                         transition={{ duration: 0.3 }}
-                        className="fixed top-0 left-0 h-full w-64 bg-black border-blue-700 border-r-2  shadow-2xl z-20 p-6 flex flex-col gap-6"
+                        className="fixed top-0 left-0 h-full w-1/4 bg-black border-blue-700 border-r-2  shadow-2xl z-20 p-2 flex flex-col gap-6"
                     >
                         <h2 className="text-white text-2xl font-bold border-b border-gray-600 pb-2">
-                            Chats
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    Chats
+                                </div>
+                                <button onClick={handleChatCreation}>
+
+                                    <IoMdAddCircleOutline />
+                                </button>
+                            </div>
                         </h2>
+
+                        {chatIds.map((value) =>
+                            <div className="bg-slate-700 p-2 rounded-xl">
+                                <Link to={`/chat/${value}`}> {value}</Link>
+
+
+                            </div>
+                        )}
+
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="mt-auto bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
