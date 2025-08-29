@@ -183,13 +183,13 @@ export const UI = ({ hidden, meta_ui }) => {
                             </div>
                         </h2>
 
-                        {chatIds.map((value) =>
-                            <div className="bg-slate-700 p-2 rounded-xl">
-                                <Link to={`/chat/${value}`}> {value}</Link>
-
-
-                            </div>
-                        )}
+                        <div className="flex space-y-4 flex-col overflow-y-scroll">
+                            {chatIds.map((value) =>
+                                <div className="bg-slate-700 p-2 text-center rounded-md">
+                                    <Link to={`/chat/${value}`}> {value}</Link>
+                                </div>
+                            )}
+                        </div>
 
                         <button
                             onClick={() => setSidebarOpen(false)}
