@@ -10,7 +10,7 @@ import {promises as fs} from 'fs';
 import {GoogleGenerativeAI} from '@google/generative-ai';
 import Groq from 'groq-sdk';
 
-import {Db, MongoClient} from 'mongodb';
+import {Db, MongoClient, ObjectId} from 'mongodb';
 import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
 
 interface AiResponse {
@@ -466,6 +466,27 @@ app.get('/:user/ids/create', async (req, res) => {
     res.send({
       status: 'ok',
       id: resp.insertedId,
+    });
+  }
+});
+
+app.get('/:user/:id/delete', async (req, res) => {
+  if (!db) {
+    res.send({
+      error: 'db not found',
+    });
+  } else {
+    const col = db.collection('ids');
+    await col.deleteOne({
+      user: req.params.user,
+      _id: new ObjectId(req.params.id),
+    });
+
+    const hCol = db.collection(`his-${req.params.id}`);
+    await hCol.drop();
+
+    res.send({
+      status: 'ok',
     });
   }
 });

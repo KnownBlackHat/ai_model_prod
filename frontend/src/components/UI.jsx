@@ -7,7 +7,8 @@ import { IoSendSharp } from "react-icons/io5";
 import CompanyLogo from "../assets/cybergenix.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import { Link, redirect, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { MdDeleteOutline } from "react-icons/md";
 
 
 const WAKE_WORD = ["niva", " va ", "liva"];
@@ -23,6 +24,14 @@ export const UI = ({ hidden, meta_ui }) => {
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
 
+    async function handleDeleteHistory(id) {
+        const resp = await fetch(
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/${id}/delete`
+        );
+        await resp.json();
+        await refreshChatIds();
+    }
+
     async function handleChatCreation(store = false) {
         const resp = await fetch(
             `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids/create`
@@ -35,13 +44,18 @@ export const UI = ({ hidden, meta_ui }) => {
         navigate(`/chat/${res.id}`);
     }
 
+    async function refreshChatIds() {
+        const resp = await fetch(
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`
+        )
+        const res = await resp.json()
+        setChatIds(res)
+
+    }
+
     useEffect(() => {
         async function main() {
-            const resp = await fetch(
-                `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`
-            )
-            const res = await resp.json()
-            setChatIds(res)
+            await refreshChatIds();
 
             const route_his = window.localStorage.getItem("route_his");
             if (route_his) {
@@ -189,8 +203,9 @@ export const UI = ({ hidden, meta_ui }) => {
 
                         <div className="flex space-y-4 flex-col overflow-y-scroll">
                             {chatIds.map((value) =>
-                                <div className="bg-slate-700 p-2 text-center rounded-md">
+                                <div className="bg-slate-700 p-2 text-center rounded-md flex justify-between items-center">
                                     <Link to={`/chat/${value}`}> {value}</Link>
+                                    <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value)} />
                                 </div>
                             )}
                         </div>
