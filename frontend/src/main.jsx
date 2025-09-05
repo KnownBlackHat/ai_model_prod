@@ -4,6 +4,10 @@ import App from "./App";
 import { ChatProvider } from "./hooks/useChat";
 import "./index.css";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import Landing from './pages/Landing';
+import Pricing from "./pages/Pricing";
+import Footer from "./pages/Footer";
+import Header from "./pages/Header";
 
 let router = createBrowserRouter([
     {
@@ -28,7 +32,7 @@ let router = createBrowserRouter([
     },
     {
         path: "/",
-        element: <Navigate to="/chat" replace />
+        element: <> <Header /> <Landing /> <Pricing /> <Footer /> </>
     }
 ]);
 
