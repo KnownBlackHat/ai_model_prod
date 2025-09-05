@@ -22,8 +22,8 @@ function Niva() {
                         Meet your ultimate AI companion – a smart, speaking, listening model built to solve everything!
                     </p>
                     <div className="mt-6 flex items-center gap-3">
-                        <button className="rounded-lg bg-blue-600 px-5 py-2 font-semibold">Try Now</button>
-                        <button className="rounded-lg bg-white/10 px-5 py-2 font-semibold">Buy Now</button>
+                        <a href="/chat" className="rounded-lg bg-blue-600 px-5 py-2 font-semibold">Try Now</a>
+                        <a href="/#pricing" className="rounded-lg bg-white/10 px-5 py-2 font-semibold">Buy Now</a>
                     </div>
 
                     {/* avatars */}
