@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import wiki from 'wikipedia';
 import * as fs from 'fs';
 
@@ -26,7 +26,7 @@ export async function streamToBase64(stream: ReadableStream) {
 
   let done, value;
 
-  while ((({done, value} = await reader.read()), !done)) {
+  while ((({ done, value } = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -184,11 +184,11 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
-const readJsonTranscript = async (file: string) => {
-  return JSON.parse(fs.readFile(file, 'utf8'));
-};
+// async function readJsonTranscript(file: string) {
+//   return JSON.parse(fs.readFile(file, 'utf8') || '');
+// }
 
-const audioFileToBase64 = async (file: string) => {
-  const data = fs.readFile(file);
-  return data.toString('base64');
-};
+// const audioFileToBase64 = async (file: string) => {
+//   const data = fs.readFile(file);
+//   return data.toString('base64');
+// };

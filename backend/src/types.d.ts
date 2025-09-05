@@ -24,3 +24,7 @@ interface Dblist {
   user: string;
   assistant: string;
 }
+
+interface AuthRequest extends Request {
+  user?: {username: string};
+}
