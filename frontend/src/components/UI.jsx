@@ -26,16 +26,32 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function handleDeleteHistory(id) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/${id}/delete`
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/${id}/delete`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            }
         );
+        if (resp.status === 401) {
+            navigate("/login")
+        }
         await resp.json();
         await refreshChatIds();
     }
 
     async function handleChatCreation(store = false) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids/create`
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids/create`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            }
         )
+        if (resp.status === 401) {
+            navigate("/login")
+        }
         const res = await resp.json();
         setChatIds(ids => [...ids, res.id]);
         if (store) {
@@ -46,8 +62,17 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function refreshChatIds() {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`
+            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+
         )
+        if (resp.status === 401) {
+            navigate("/login")
+        }
         const res = await resp.json()
         setChatIds(res)
 
@@ -89,8 +114,18 @@ export const UI = ({ hidden, meta_ui }) => {
 
     useEffect(() => {
         async function load_data() {
-            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/${chatId}`);
+            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/${chatId}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+
+            );
             const json_resp = await resp.json()
+            if (resp.status === 401) {
+                navigate("/login")
+            }
             setChatHistory(json_resp);
         };
         if (chatId !== 0) load_data();

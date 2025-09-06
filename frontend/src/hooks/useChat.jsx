@@ -1,19 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 const backendUrl = `//${import.meta.env.VITE_BACKENDADDR}`;
 
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
+    const navigate = useNavigate();
     const chat = async (message) => {
         setLoading(false);
         const data = await fetch(`${backendUrl}/chat/${chatId}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({ message }),
         });
+        if (data.status === 401) {
+            navigate("/login")
+        }
         const resp = (await data.json()).messages;
         setMessages((messages) => [...messages, ...resp]);
         setLoading(false);

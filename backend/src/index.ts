@@ -1,4 +1,4 @@
-import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, {
@@ -8,9 +8,9 @@ import express, {
   RequestHandler,
 } from 'express';
 
-import {Db, MongoClient, ObjectId} from 'mongodb';
-import {streamToBase64} from './helper';
-import {groq} from './llm_interface';
+import { Db, MongoClient, ObjectId } from 'mongodb';
+import { streamToBase64 } from './helper';
+import { groq } from './llm_interface';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
@@ -40,11 +40,15 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
-const secret = process.env.JWT_SECRET || 'your-secret-key';
+app.use((req, res, next) => {
+  console.log('req: ', req.path);
+  next();
+});
+const secret = process.env.JWT_SECRET || '';
 const port = 3000;
 
 interface AuthRequest extends Request {
-  user?: {username: string};
+  user?: { username: string };
 }
 
 function asyncHandler<R extends Request = Request>(
@@ -63,16 +67,16 @@ const authenticate = asyncHandler<AuthRequest>(
       const authHeader = req.headers['authorization'];
       const token = authHeader && authHeader.split(' ')[1];
       if (!token) {
-        res.status(401).send({error: 'No token provided'});
+        res.status(401).send({ error: 'No token provided' });
         return;
       }
 
       try {
-        const decoded = jwt.verify(token, secret) as {username: string};
+        const decoded = jwt.verify(token, secret) as { username: string };
         req.user = decoded;
         next();
       } catch (err) {
-        res.status(403).send({error: 'Invalid token'});
+        res.status(403).send({ error: 'Invalid token' });
       }
     }
   },
@@ -81,7 +85,7 @@ const authenticate = asyncHandler<AuthRequest>(
 app.use(authenticate);
 
 app.post('/signup', async (req: Request, res: Response): Promise<any> => {
-  const {username, password} = req.body as {
+  const { username, password } = req.body as {
     username?: string;
     password?: string;
   };
@@ -118,29 +122,29 @@ app.post('/signup', async (req: Request, res: Response): Promise<any> => {
 });
 
 app.post('/login', async (req: Request, res: Response): Promise<any> => {
-  const {username, password} = req.body as {
+  const { username, password } = req.body as {
     username?: string;
     password?: string;
   };
   if (!username || !password) {
-    return res.status(400).send({error: 'Username and password are required'});
+    return res.status(400).send({ error: 'Username and password are required' });
   }
 
   if (!db) {
-    return res.status(500).send({error: 'Database not found'});
+    return res.status(500).send({ error: 'Database not found' });
   }
 
   const usersCol = db.collection('users');
-  const user = (await usersCol.findOne({username})) as {
+  const user = (await usersCol.findOne({ username })) as {
     username: string;
     password: string;
   } | null;
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).send({error: 'Invalid credentials'});
+    return res.status(401).send({ error: 'Invalid credentials' });
   }
 
-  const token = jwt.sign({username: user.username}, secret, {expiresIn: '1h'});
-  res.send({token});
+  const token = jwt.sign({ username: user.username }, secret, { expiresIn: '1h' });
+  res.send({ token });
 });
 
 app.get('/history/:id', async (req, res) => {
@@ -171,7 +175,7 @@ app.get('/:user/ids', async (req, res) => {
       .find({
         user: req.params.user,
       })
-      .sort({_id: -1})
+      .sort({ _id: -1 })
       .toArray();
 
     const ids_arr = [];
@@ -272,7 +276,7 @@ app.post('/chat/:id', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({messages});
+  res.send({ messages });
 });
 
 app.listen(port, async () => {

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [err, setErr] = useState('');
     const [succ, setSucc] = useState('');
+    const navigate = useNavigate();
 
     async function handleLogin() {
         setErr()
@@ -20,6 +22,7 @@ function Login() {
             if (response.ok) {
                 localStorage.setItem("token", data.token)
                 setSucc("Authorized");
+                navigate("/chat")
             } else {
                 setErr("Login Failed")
             }
@@ -28,6 +31,12 @@ function Login() {
             setErr("Login Failed")
         }
     }
+
+    useEffect(() => {
+        if (window.localStorage.getItem("token")) {
+            navigate("/chat")
+        }
+    }, [])
 
     return (
         <section className="text-white bg-black py-24 min-h-screen items-center flex justify-center"
