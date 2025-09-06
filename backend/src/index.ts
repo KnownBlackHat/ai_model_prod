@@ -41,7 +41,14 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use((req, res, next) => {
-  console.log('req: ', req.path);
+  console.log(
+    'req: ',
+    req.path,
+    'resp: ',
+    res.statusCode,
+    'header:',
+    req.headers,
+  );
   next();
 });
 const secret = process.env.JWT_SECRET || '';

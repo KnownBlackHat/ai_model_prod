@@ -33,7 +33,7 @@ export const UI = ({ hidden, meta_ui }) => {
                 }
             }
         );
-        if (resp.status === 401) {
+        if (resp.status === 401 || resp.status == 403) {
             navigate("/login")
         }
         await resp.json();
@@ -49,10 +49,11 @@ export const UI = ({ hidden, meta_ui }) => {
                 }
             }
         )
-        if (resp.status === 401) {
+        if (resp.status === 401 || resp.status == 403) {
             navigate("/login")
         }
         const res = await resp.json();
+        console.log("handler: ", resp.status)
         setChatIds(ids => [...ids, res.id]);
         if (store) {
             window.localStorage.setItem("route_his", input.current.value);
@@ -70,9 +71,10 @@ export const UI = ({ hidden, meta_ui }) => {
             }
 
         )
-        if (resp.status === 401) {
+        if (resp.status === 401 || resp.status == 403) {
             navigate("/login")
         }
+        console.log(resp.status)
         const res = await resp.json()
         setChatIds(res)
 
@@ -123,7 +125,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
             );
             const json_resp = await resp.json()
-            if (resp.status === 401) {
+            if (resp.status === 401 || resp.status == 403) {
                 navigate("/login")
             }
             setChatHistory(json_resp);
@@ -245,12 +247,20 @@ export const UI = ({ hidden, meta_ui }) => {
                             )}
                         </div>
 
-                        <button
-                            onClick={() => setSidebarOpen(false)}
-                            className="mt-auto bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
-                        >
-                            Close
-                        </button>
+                        <div className="mt-auto w-full flex space-x-6 justify-between">
+                            <button
+                                onClick={() => setSidebarOpen(false)}
+                                className="mt-auto w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={() => window.localStorage.removeItem("token")}
+                                className="mt-auto w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
+                            >
+                                Logout
+                            </button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

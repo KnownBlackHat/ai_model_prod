@@ -17,7 +17,7 @@ export const ChatProvider = ({ children }) => {
             },
             body: JSON.stringify({ message }),
         });
-        if (data.status === 401) {
+        if (data.status === 401 || resp.status == 403) {
             navigate("/login")
         }
         const resp = (await data.json()).messages;
