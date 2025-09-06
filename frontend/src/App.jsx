@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
 import { Experience } from "./components/Experience";
 import { UI } from "./components/UI";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useParams } from 'react-router';
 import { useChat } from './hooks/useChat';

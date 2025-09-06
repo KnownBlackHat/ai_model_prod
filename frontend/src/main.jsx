@@ -8,6 +8,7 @@ import Landing from './pages/Landing';
 import Pricing from "./pages/Pricing";
 import Footer from "./pages/Footer";
 import Header from "./pages/Header";
+import Login from "./pages/Login";
 
 let router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ let router = createBrowserRouter([
     {
         path: "/",
         element: <> <Header /> <Landing /> <Pricing /> <Footer /> </>
+    },
+    {
+        path: "/login",
+        element: <> <Header />  <Login /> <Footer /> </>
     }
 ]);
 
