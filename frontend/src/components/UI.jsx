@@ -255,7 +255,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                 Close
                             </button>
                             <button
-                                onClick={() => window.localStorage.removeItem("token")}
+                                onClick={() => { window.localStorage.removeItem("token"); navigate('/login') }}
                                 className="mt-auto w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
                             >
                                 Logout
