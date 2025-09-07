@@ -9,6 +9,7 @@ import Pricing from "./pages/Pricing";
 import Footer from "./pages/Footer";
 import Header from "./pages/Header";
 import Login from "./pages/Login";
+import CreateAcc from "./pages/CreateAcc";
 
 let router = createBrowserRouter([
     {
@@ -38,6 +39,9 @@ let router = createBrowserRouter([
     {
         path: "/login",
         element: <> <Header />  <Login /> <Footer /> </>
+    }, {
+        path: "/signup",
+        element: <> <Header />  <CreateAcc /> <Footer /> </>
     }
 ]);
 
