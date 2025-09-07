@@ -19,14 +19,14 @@ export const UI = ({ hidden, meta_ui }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
-    const { chat, loading, message, chatId } = useChat();
+    const { chat, loading, message, chatId, username } = useChat();
     const [chatIds, setChatIds] = useState([]);
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
 
     async function handleDeleteHistory(id) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/${id}/delete`,
+            `//${import.meta.env.VITE_BACKENDADDR}/${username}/${id}/delete`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -42,7 +42,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function handleChatCreation(store = false) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids/create`,
+            `//${import.meta.env.VITE_BACKENDADDR}/${username}/ids/create`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -63,7 +63,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function refreshChatIds() {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/tejas/ids`,
+            `//${import.meta.env.VITE_BACKENDADDR}/${username}/ids`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -229,7 +229,7 @@ export const UI = ({ hidden, meta_ui }) => {
                         <h2 className="text-white text-2xl font-bold border-b border-gray-600 pb-2">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    Chats
+                                    Welcome, {username}
                                 </div>
                                 <button onClick={handleChatCreation}>
 

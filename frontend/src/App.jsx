@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Leva } from "leva";
 import { Experience } from "./components/Experience";
 import { UI } from "./components/UI";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useParams } from 'react-router';
 import { useChat } from './hooks/useChat';
@@ -21,6 +21,7 @@ function App() {
     const meta_ui = { animations, animation, setAnimation, facialExpression, setFacialExpression };
     const isMobile = window.screen.width < window.screen.height;
     setChatId(webChatId ?? 0);
+
 
     return (
         isMobile ? <>

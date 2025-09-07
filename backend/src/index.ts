@@ -24,7 +24,7 @@ const url = process.env.MONGO_URL;
 if (!url) throw new Error('Mongo db url not found');
 
 const client = new MongoClient(url);
-let db: Db | null = null;
+let db: Db | undefined = undefined;
 
 async function run() {
   try {
@@ -41,14 +41,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use((req, res, next) => {
-  console.log(
-    'req: ',
-    req.path,
-    'resp: ',
-    res.statusCode,
-    'header:',
-    req.headers,
-  );
+  console.log('req: ', req.path, 'resp: ', res.statusCode);
   next();
 });
 const secret = process.env.JWT_SECRET || '';
@@ -154,6 +147,14 @@ app.post('/login', async (req: Request, res: Response): Promise<any> => {
   res.send({ token });
 });
 
+app.get('/user', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  const decoded = jwt.verify(token || '', secret || '') as { username: string };
+  console.log(decoded.username);
+  res.send({ username: decoded.username });
+});
+
 app.get('/history/:id', async (req, res) => {
   if (!db) {
     res.send({
@@ -249,7 +250,7 @@ app.post('/chat/:id', async (req, res) => {
   const userMessage = req.body.message;
 
   let stime = new Date().getTime();
-  const messages: AiResponse[] = await groq(userMessage, req.params.id);
+  const messages: AiResponse[] = await groq(userMessage, db, req.params.id);
   console.log(`LLM: ${new Date().getTime() - stime} ms`);
   async function genmetadata(i: number) {
     const stime = new Date().getTime();

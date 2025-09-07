@@ -1,15 +1,13 @@
 import axios from 'axios';
-import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
-import {GoogleGenerativeAI} from '@google/generative-ai';
-import {parse, checkKeys, report_discord, wikipedia} from './helper';
+import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { parse, checkKeys, report_discord, wikipedia } from './helper';
 import Groq from 'groq-sdk';
-import {Db} from 'mongodb';
+import { Db } from 'mongodb';
 
 const groq_agent = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
-
-const db: Db | null = null;
 
 async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
   console.log(`user: ${request.prompt}`);
@@ -66,12 +64,16 @@ function groq_history_builder(dblist: Dblist[]): ChatCompletionMessageParam[] {
   return response;
 }
 
-export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
+export async function groq(
+  query: string,
+  db?: Db,
+  id = '1',
+): Promise<AiResponse[]> {
   if (!db) {
     throw new Error('Unable to get db');
   }
   const col = db.collection(`his-${id}`);
-  const history = await col.find({}).sort({_id: -1}).limit(20).toArray();
+  const history = await col.find({}).sort({ _id: -1 }).limit(20).toArray();
   history.reverse();
   const obj = groq_history_builder(history as unknown as Dblist[]);
   console.log(obj);
@@ -167,7 +169,7 @@ export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
       `,
       true,
     );
-    return groq(query, id); // RISKY CODE
+    return groq(query, db, id); // RISKY CODE
     return [
       {
         text: 'Sorry i was not able to hear you, could you please repeat your query!',
