@@ -12,6 +12,7 @@ function Login() {
         setErr()
         setSucc()
         try {
+            console.log(`${import.meta.env.VITE_BACKENDADDR}/login`)
             const response = await fetch(
                 `${import.meta.env.VITE_BACKENDADDR}/login`, {
                 method: "POST",
