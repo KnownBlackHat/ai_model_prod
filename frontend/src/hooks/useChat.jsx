@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
-const backendUrl = `//${import.meta.env.VITE_BACKENDADDR}`;
+const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 const ChatContext = createContext();
 

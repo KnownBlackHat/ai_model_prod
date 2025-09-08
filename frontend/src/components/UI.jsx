@@ -26,7 +26,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function handleDeleteHistory(id) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/${username}/${id}/delete`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username}/${id}/delete`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -42,7 +42,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function handleChatCreation(store = false) {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/${username}/ids/create`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username}/ids/create`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -63,7 +63,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function refreshChatIds() {
         const resp = await fetch(
-            `//${import.meta.env.VITE_BACKENDADDR}/${username}/ids`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username}/ids`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -116,7 +116,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     useEffect(() => {
         async function load_data() {
-            const resp = await fetch(`//${import.meta.env.VITE_BACKENDADDR}/history/${chatId}`,
+            const resp = await fetch(`${import.meta.env.VITE_BACKENDADDR}/history/${chatId}`,
                 {
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`

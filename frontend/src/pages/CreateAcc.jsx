@@ -14,7 +14,7 @@ function CreateAcc() {
         setSucc()
         try {
             const response = await fetch(
-                `//${import.meta.env.VITE_BACKENDADDR}/signup`, {
+                `${import.meta.env.VITE_BACKENDADDR}/signup`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })

@@ -13,7 +13,7 @@ function Login() {
         setSucc()
         try {
             const response = await fetch(
-                `//${import.meta.env.VITE_BACKENDADDR}/login`, {
+                `${import.meta.env.VITE_BACKENDADDR}/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
