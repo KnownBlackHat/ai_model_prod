@@ -3,4 +3,5 @@ WORKDIR /app
 
 COPY . /app
 RUN bun install
-ENTRYPOINT ["bun", "run", "dev"]
+RUN bun run build
+ENTRYPOINT ["bun", "run", "start"]
