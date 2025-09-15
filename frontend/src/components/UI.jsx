@@ -33,8 +33,10 @@ export const UI = ({ hidden, meta_ui }) => {
                 }
             }
         );
-        if (resp.status === 401 || resp.status == 403) {
+        if (resp.status === 401) {
             navigate("/login")
+        } else if (resp.status === 403) {
+            window.localStorage.removeItem("token")
         }
         await resp.json();
         await refreshChatIds();
@@ -49,8 +51,10 @@ export const UI = ({ hidden, meta_ui }) => {
                 }
             }
         )
-        if (resp.status === 401 || resp.status == 403) {
+        if (resp.status === 401) {
             navigate("/login")
+        } else if (resp.status === 403) {
+            window.localStorage.removeItem("token")
         }
         const res = await resp.json();
         console.log("handler: ", resp.status)
@@ -71,10 +75,11 @@ export const UI = ({ hidden, meta_ui }) => {
             }
 
         )
-        if (resp.status === 401 || resp.status == 403) {
+        if (resp.status === 401) {
             navigate("/login")
+        } else if (resp.status === 403) {
+            window.localStorage.removeItem("token")
         }
-        console.log(resp.status)
         const res = await resp.json()
         setChatIds(res)
 
@@ -125,8 +130,10 @@ export const UI = ({ hidden, meta_ui }) => {
 
             );
             const json_resp = await resp.json()
-            if (resp.status === 401 || resp.status == 403) {
+            if (resp.status === 401) {
                 navigate("/login")
+            } else if (resp.status === 403) {
+                window.localStorage.removeItem("token")
             }
             setChatHistory(json_resp);
         };

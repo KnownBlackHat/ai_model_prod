@@ -34,7 +34,6 @@ export const ChatProvider = ({ children }) => {
         setMessages((messages) => messages.slice(1));
     };
     useEffect(() => {
-        console.log('ran')
         async function main() {
             const data = await fetch(`${backendUrl}/user`, {
                 headers: {

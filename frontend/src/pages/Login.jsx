@@ -34,9 +34,27 @@ function Login() {
     }
 
     useEffect(() => {
-        if (window.localStorage.getItem("token")) {
-            navigate("/chat")
+        async function main() {
+            if (window.localStorage.getItem("token")) {
+
+
+                const resp = await fetch(
+                    `${import.meta.env.VITE_BACKENDADDR}/${username}/ids`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`
+                        }
+                    }
+
+                )
+                if (resp.status == 403) {
+                    window.localStorage.removeItem("token")
+                }
+
+                navigate("/chat")
+            }
         }
+        main()
     }, [])
 
     return (
