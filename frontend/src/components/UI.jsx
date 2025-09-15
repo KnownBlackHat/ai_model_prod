@@ -37,6 +37,7 @@ export const UI = ({ hidden, meta_ui }) => {
             navigate("/login")
         } else if (resp.status === 403) {
             window.localStorage.removeItem("token")
+            navigate("/login")
         }
         await resp.json();
         await refreshChatIds();
@@ -55,6 +56,7 @@ export const UI = ({ hidden, meta_ui }) => {
             navigate("/login")
         } else if (resp.status === 403) {
             window.localStorage.removeItem("token")
+            navigate("/login")
         }
         const res = await resp.json();
         console.log("handler: ", resp.status)
@@ -79,6 +81,7 @@ export const UI = ({ hidden, meta_ui }) => {
             navigate("/login")
         } else if (resp.status === 403) {
             window.localStorage.removeItem("token")
+            navigate("/login")
         }
         const res = await resp.json()
         setChatIds(res)
@@ -134,6 +137,7 @@ export const UI = ({ hidden, meta_ui }) => {
                 navigate("/login")
             } else if (resp.status === 403) {
                 window.localStorage.removeItem("token")
+                navigate("/login")
             }
             setChatHistory(json_resp);
         };
