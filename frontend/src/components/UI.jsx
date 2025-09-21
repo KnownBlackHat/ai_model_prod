@@ -12,16 +12,18 @@ import { MdDeleteOutline } from "react-icons/md";
 
 
 const WAKE_WORD = ["niva", " va ", "liva"];
+const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
     const [audioState, setaudioState] = useState("idle");
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [curCredit, setCurCredit] = useState(0);
-    const [maxCredit, setMaxCredit] = useState(100);
+    const [maxCredit, _] = useState(100);
+    const [username, setUsername] = useState();
     const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
-    const { chat, loading, message, chatId, username } = useChat();
+    const { chat, loading, message, chatId } = useChat();
     const [chatIds, setChatIds] = useState([]);
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
@@ -47,8 +49,23 @@ export const UI = ({ hidden, meta_ui }) => {
 
     };
 
+    async function get_username() {
+        const data = await fetch(`${backendUrl}/user`, {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+        });
+        if (data.ok) {
+            const { username } = await data.json()
+            setUsername(username);
+            return username;
+        }
+
+    }
+
     useEffect(() => {
         async function main() {
+            await get_username();
             await fetchCredits();
         }
         main();
@@ -56,8 +73,12 @@ export const UI = ({ hidden, meta_ui }) => {
 
 
     async function handleDeleteHistory(id) {
+        let usr_name;
+        if (!username) {
+            usr_name = await get_username()
+        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username}/${id}/delete`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/${id}/delete`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -75,8 +96,12 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function handleChatCreation(store = false) {
+        let usr_name;
+        if (!username) {
+            usr_name = await get_username()
+        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username}/ids/create`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids/create`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -90,7 +115,6 @@ export const UI = ({ hidden, meta_ui }) => {
             navigate("/login")
         }
         const res = await resp.json();
-        console.log("handler: ", resp.status)
         setChatIds(ids => [...ids, res.id]);
         if (store) {
             window.localStorage.setItem("route_his", input.current.value);
@@ -99,8 +123,12 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function refreshChatIds() {
+        let usr_name;
+        if (!username) {
+            usr_name = await get_username()
+        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username}/ids`,
+            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -250,6 +278,7 @@ export const UI = ({ hidden, meta_ui }) => {
             ]);
 
             input.current.value = "";
+            await fetchCredits();
         }
     };
 
@@ -292,7 +321,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
                         <div className="flex space-y-4 flex-col overflow-y-scroll">
                             {chatIds.map((value) =>
-                                <div className="bg-slate-700 p-2 text-center rounded-md flex justify-between items-center">
+                                <div className="bg-slate-700 text-white p-2 text-center rounded-md flex justify-between items-center">
                                     <Link to={`/chat/${value}`}> {value}</Link>
                                     <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value)} />
                                 </div>
@@ -418,14 +447,19 @@ export const UI = ({ hidden, meta_ui }) => {
                         )}
 
                         {audioState === "idle" && (
-                            <button
-                                disabled={loading || message}
-                                onClick={sendMessage}
-                                className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
-                                    }`}
-                            >
-                                <IoSendSharp />
-                            </button>
+                            <div>
+                                <button
+                                    disabled={loading || message}
+                                    onClick={sendMessage}
+                                    className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
+                                        }`}
+                                >
+                                    <IoSendSharp />
+                                </button>
+                                <div className="text-xs text-center mt-2 text-blue-200">
+                                    Credits: {curCredit}/{maxCredit}
+                                </div>
+                            </div>
                         )}
                     </div>
                     <div className="flex items-center justify-center mt-6">

@@ -33,24 +33,9 @@ export const ChatProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const [cameraZoomed, setCameraZoomed] = useState(true);
     const [chatId, setChatId] = useState(0);
-    const [username, setUsername] = useState();
     const onMessagePlayed = () => {
         setMessages((messages) => messages.slice(1));
     };
-    useEffect(() => {
-        async function main() {
-            const data = await fetch(`${backendUrl}/user`, {
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
-                },
-            });
-            if (data.ok) {
-                const { username } = await data.json()
-                setUsername(username);
-            }
-        }
-        main()
-    }, [])
 
 
     useEffect(() => {
@@ -72,7 +57,6 @@ export const ChatProvider = ({ children }) => {
                 setCameraZoomed,
                 chatId,
                 setChatId,
-                username
 
             }}
         >
