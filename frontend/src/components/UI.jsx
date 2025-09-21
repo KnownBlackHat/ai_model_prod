@@ -43,7 +43,7 @@ export const UI = ({ hidden, meta_ui }) => {
             navigate("/login")
         }
         const res = await resp.json();
-        setCurCredit(res.current);
+        setCurCredit(res.credits);
 
     };
 
