@@ -28,7 +28,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function fetchCredits() {
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username}/credits`,
+            `${import.meta.env.VITE_BACKENDADDR}/credits`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
