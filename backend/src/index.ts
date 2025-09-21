@@ -13,6 +13,7 @@ import { streamToBase64 } from './helper';
 import { groq } from './llm_interface';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+import { expend_credit, get_credit } from './controller/credits';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -115,6 +116,7 @@ app.post('/signup', async (req: Request, res: Response): Promise<any> => {
   await usersCol.insertOne({
     username,
     password: hashedPassword,
+    credits: 100,
   });
   res.send({
     status: 'ok',
@@ -151,7 +153,6 @@ app.get('/user', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   const decoded = jwt.verify(token || '', secret || '') as { username: string };
-  console.log(decoded.username);
   res.send({ username: decoded.username });
 });
 
@@ -247,6 +248,17 @@ app.post('/chat/:id', async (req, res) => {
     }
     */
 
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  const decoded = jwt.verify(token || '', secret || '') as { username: string };
+  const is_expended = await expend_credit(db as Db, decoded.username, 1);
+  if (!is_expended) {
+    res.status(402).send({
+      error: 'Not enough credits',
+    });
+    return;
+  }
+
   const userMessage = req.body.message;
 
   let stime = new Date().getTime();
@@ -285,6 +297,20 @@ app.post('/chat/:id', async (req, res) => {
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
   res.send({ messages });
+});
+
+app.get('/credits', async (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  const decoded = jwt.verify(token || '', secret || '') as { username: string };
+  if (!db) {
+    res.send({
+      error: 'db not found',
+    });
+  }
+  res.send({
+    credits: await get_credit(db as Db, decoded.username),
+  });
 });
 
 app.listen(port, async () => {
