@@ -20,9 +20,13 @@ export const ChatProvider = ({ children }) => {
         if (data.status === 401 || data.status == 403) {
             navigate("/login")
         }
+        if (data.status === 402) {
+            return false;
+        }
         const resp = (await data.json()).messages;
         setMessages((messages) => [...messages, ...resp]);
         setLoading(false);
+        return true;
     };
     const [messages, setMessages] = useState([]);
     const [message, setMessage] = useState();

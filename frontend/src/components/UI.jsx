@@ -17,12 +17,43 @@ export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
     const [audioState, setaudioState] = useState("idle");
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [curCredit, setCurCredit] = useState(0);
+    const [maxCredit, setMaxCredit] = useState(100);
     const [toggleContextHistory, setToggleContextHistory] = useState(true);
     const [chatHistory, setChatHistory] = useState([]);
     const { chat, loading, message, chatId, username } = useChat();
     const [chatIds, setChatIds] = useState([]);
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
+
+    async function fetchCredits() {
+        const resp = await fetch(
+            `${import.meta.env.VITE_BACKENDADDR}/${username}/credits`,
+            {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        )
+        if (resp.status === 401) {
+            navigate("/login")
+        }
+        else if (resp.status === 403) {
+            window.localStorage.removeItem("token")
+            navigate("/login")
+        }
+        const res = await resp.json();
+        setCurCredit(res.current);
+
+    };
+
+    useEffect(() => {
+        async function main() {
+            await fetchCredits();
+        }
+        main();
+    }, []);
+
 
     async function handleDeleteHistory(id) {
         const resp = await fetch(
@@ -201,7 +232,13 @@ export const UI = ({ hidden, meta_ui }) => {
         const text = input.current.value;
 
         if (!loading && !message && text.trim() !== "") {
-            chat(text);
+            const rep_stat = chat(text);
+            if (!rep_stat) {
+                alert("Your credit has exhausted. Please upgrade your plan.");
+                meta_ui.setAnimation("Idle");
+                return;
+            }
+
 
             setChatHistory(his => [
                 ...his,
@@ -241,6 +278,10 @@ export const UI = ({ hidden, meta_ui }) => {
                             <div className="flex items-center justify-between">
                                 <div>
                                     Welcome, {username}
+                                    <br />
+                                    <span className="text-sm">
+                                        Credit: {curCredit}/{maxCredit}
+                                    </span>
                                 </div>
                                 <button onClick={handleChatCreation}>
 
