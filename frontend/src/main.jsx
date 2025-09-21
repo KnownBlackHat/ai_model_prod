@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { ChatProvider } from "./hooks/useChat";
 import "./index.css";
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import Landing from './pages/Landing';
 import Pricing from "./pages/Pricing";
 import Footer from "./pages/Footer";
@@ -11,7 +11,7 @@ import Header from "./pages/Header";
 import Login from "./pages/Login";
 import CreateAcc from "./pages/CreateAcc";
 
-let router = createBrowserRouter([
+let router = createHashRouter([
     {
         path: "/chat",
         element: (
