@@ -205,11 +205,14 @@ export const UI = ({ hidden, meta_ui }) => {
     }, []);
 
     const MicStop = () => {
-        window.micd = true;
-        window.rec.abort();
-        meta_ui.setAnimation("Idle");
-        setaudioState("idle");
-        window.rec.stop();
+        try {
+            window.micd = true;
+            window.rec.abort();
+            meta_ui.setAnimation("Idle");
+            setaudioState("idle");
+            window.rec.stop();
+        }
+        catch { }
     };
 
     const speechReconCleanup = (text = null) => {
@@ -218,37 +221,39 @@ export const UI = ({ hidden, meta_ui }) => {
     };
 
     const speechRecon = () => {
-        window.micd = false;
-        let speech = "";
-        const recApi = window?.webkitSpeechRecognition || window?.SpeechRecognition;
-        if (!recApi) {
-            alert("SpeechRecognition won't work for you");
-            return;
-        }
-
-        window.rec = new recApi();
-        window.rec.lang = "en-IN";
-        window.rec.interimResults = true;
-
-        window.rec.onresult = (e) => {
-            speech = Array.from(e.results).map((result) => result[0].transcript).join("");
-            meta_ui.setAnimation("Listening_1");
-        };
-
-        window.rec.start();
-        setaudioState("listen");
-
-        window.rec.addEventListener("end", () => {
-            if (WAKE_WORD.some((word) => speech.toLowerCase().includes(word))) {
-                speechReconCleanup(speech);
-                speech = "";
-                window.rec.stop();
-            } else {
-                meta_ui.setAnimation("Idle");
-                window?.micd ? null : window.rec.start();
+        try {
+            window.micd = false;
+            let speech = "";
+            const recApi = window?.webkitSpeechRecognition || window?.SpeechRecognition;
+            if (!recApi) {
+                alert("SpeechRecognition won't work for you");
+                return;
             }
-        });
-    };
+
+            window.rec = new recApi();
+            window.rec.lang = "en-IN";
+            window.rec.interimResults = true;
+
+            window.rec.onresult = (e) => {
+                speech = Array.from(e.results).map((result) => result[0].transcript).join("");
+                meta_ui.setAnimation("Listening_1");
+            };
+
+            window.rec.start();
+            setaudioState("listen");
+
+            window.rec.addEventListener("end", () => {
+                if (WAKE_WORD.some((word) => speech.toLowerCase().includes(word))) {
+                    speechReconCleanup(speech);
+                    speech = "";
+                    window.rec.stop();
+                } else {
+                    meta_ui.setAnimation("Idle");
+                    window?.micd ? null : window.rec.start();
+                }
+            });
+        } catch { }
+    }
 
     async function sendMessage() {
         if (chatId === 0) {
@@ -365,7 +370,6 @@ export const UI = ({ hidden, meta_ui }) => {
                         </button>
                     </div>
                     <button
-                        onClick={() => window.location.href = "https://forms.gle/3c8m9bTjW7v4kW5f9"}
                         className="bg-black/70 border-2 border-blue-700 hover:bg-blue-500/70 text-white p-3 rounded-xl transition-all"
                     >
                         Get one for your business
