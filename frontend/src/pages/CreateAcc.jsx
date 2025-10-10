@@ -15,6 +15,7 @@ function CreateAcc() {
     const navigate = useNavigate();
 
     async function handleSignup() {
+        return ""
         setErr()
         setSucc()
         try {
@@ -110,6 +111,7 @@ function CreateAcc() {
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        disabled
                         className="mt-1 w-full p-2 border bg-white/5 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Enter password"
                     />
@@ -119,6 +121,7 @@ function CreateAcc() {
                     </label>
                     <input
                         type="text"
+                        disabled
                         id="cpassword"
                         value={cpassword}
                         onChange={(e) => setCpassword(e.target.value)}
@@ -128,6 +131,7 @@ function CreateAcc() {
 
                     <div className="flex justify-between mt-8">
                         <button
+                            disabled
                             onClick={handleSignup}
                             className="bg-cyan-500 p-2 rounded-lg">Submit</button>
                         <button

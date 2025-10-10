@@ -14,6 +14,7 @@ function Login() {
     const navigate = useNavigate();
 
     async function handleLogin() {
+        return ""
         setErr()
         setSucc()
         try {
@@ -112,6 +113,7 @@ function Login() {
                     </label>
                     <input
                         type="text"
+                        disabled
                         id="username"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
@@ -126,6 +128,7 @@ function Login() {
                     <input
                         type="text"
                         id="password"
+                        disabled
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="mt-1 w-full p-2 border bg-white/5 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -134,6 +137,7 @@ function Login() {
                     <div className="flex justify-between mt-8">
                         <button
                             onClick={handleLogin}
+                            disabled
                             className="bg-cyan-500 p-2 rounded-lg">Submit</button>
                         <button
                             onClick={() => navigate("/signup")}
