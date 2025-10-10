@@ -57,16 +57,8 @@ export const UI = ({ hidden, meta_ui }) => {
     };
 
     async function get_username() {
-        const data = await fetch(`${backendUrl}/user`, {
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
-            },
-        });
-        if (data.ok) {
-            const { username } = await data.json()
-            setUsername(username);
-            return username;
-        }
+        setUsername(localStorage.getItem("name"));
+        return username;
 
     }
 
@@ -351,7 +343,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                     Close
                                 </button>
                                 <button
-                                    onClick={() => { window.localStorage.removeItem("token"); navigate('/login') }}
+                                    onClick={() => { window.localStorage.clear(); navigate('/login') }}
                                     className="mt-auto w-full bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl"
                                 >
                                     Logout
@@ -366,7 +358,8 @@ export const UI = ({ hidden, meta_ui }) => {
                     <div
                         className="pointer-events-auto bg-black/70 flex justify-between text-white p-3 rounded-xl shadow-lg  transition-all"
                     >
-                        <div>
+                        <div className="flex items-center justify-center space-x-5">
+                            <img src={localStorage.getItem('pic')} className="rounded-full size-14 items-center justify-center border-2 border-white" />
                             <button
                                 onClick={() => setSidebarOpen(!sidebarOpen)}
                             >
