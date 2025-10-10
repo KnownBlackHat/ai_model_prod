@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { GoogleLogin } from "@react-oauth/google";
+import { createRemoteJWKSet, jwtVerify } from "jose";
+
+const GOOGLE_JWKS = "https://www.googleapis.com/oauth2/v3/certs";
+const JWKS = createRemoteJWKSet(new URL(GOOGLE_JWKS));
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -31,6 +36,40 @@ function Login() {
         } catch (err) {
             setErr("Login Failed")
         }
+    }
+
+    async function OnError(e) {
+        console.log("login failed", e)
+    }
+
+    async function OnSuccess(credentialResponse) {
+        setSucc()
+        setErr()
+        const { payload } = await jwtVerify(credentialResponse.credential, JWKS);
+        const { email, name, picture, sub } = payload
+        try {
+            console.log(`${import.meta.env.VITE_BACKENDADDR}/login`)
+            localStorage.setItem('name', name);
+            localStorage.setItem('pic', picture);
+            const response = await fetch(
+                `${import.meta.env.VITE_BACKENDADDR}/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, sub })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                localStorage.setItem("token", data.token)
+                setSucc("Authorized");
+                navigate("/chat")
+            } else {
+                setErr("User not found, Do create account first")
+            }
+
+        } catch (err) {
+            setErr("Login Failed")
+        }
+
     }
 
     useEffect(() => {
@@ -99,6 +138,19 @@ function Login() {
                         <button
                             onClick={() => navigate("/signup")}
                             className="underline-offset-4 font-bold underline p-2 rounded-lg">Create Account</button>
+                    </div>
+                    <div
+                        className="mt-8 w-full flex items-center text-center justify-center"
+                    >
+                        <GoogleLogin
+                            onSuccess={OnSuccess}
+                            onError={OnError}
+                            size="large"
+                            shape="circle"
+                            text="signin_with"
+                            auto_select={true}
+
+                        />
                     </div>
                 </div>
             </div>

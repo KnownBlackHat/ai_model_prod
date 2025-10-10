@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { createRemoteJWKSet, jwtVerify } from "jose";
+
+const GOOGLE_JWKS = "https://www.googleapis.com/oauth2/v3/certs";
+const JWKS = createRemoteJWKSet(new URL(GOOGLE_JWKS));
 
 function CreateAcc() {
     const [username, setUsername] = useState('');
@@ -30,6 +35,34 @@ function CreateAcc() {
             setErr("Account Creation Failed")
         }
     }
+    async function OnSuccess(credentialResponse) {
+        const { payload } = await jwtVerify(credentialResponse.credential, JWKS);
+        const { email, name, picture, sub } = payload
+        setErr()
+        setSucc()
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BACKENDADDR}/signup`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, sub, name })
+            });
+            if (response.ok || response.status === 409) {
+                setSucc("Account Created!!");
+                navigate("/login");
+            } else {
+                setErr("Account Creation Failed")
+            }
+
+        } catch (err) {
+            setErr("Account Creation Failed")
+        }
+    }
+
+    async function OnError() {
+        console.log("login failed")
+    }
+
 
     useEffect(() => {
         if (window.localStorage.getItem("token")) {
@@ -100,6 +133,19 @@ function CreateAcc() {
                         <button
                             onClick={() => navigate("/login")}
                             className="underline-offset-4 font-bold underline p-2 rounded-lg">Already have account?</button>
+                    </div>
+                    <div
+                        className="mt-8 w-full flex items-center text-center justify-center"
+                    >
+                        <GoogleLogin
+                            onSuccess={OnSuccess}
+                            onError={OnError}
+                            size="large"
+                            shape="circle"
+                            text="signin_with"
+                            auto_select={true}
+
+                        />
                     </div>
                 </div>
             </div>
