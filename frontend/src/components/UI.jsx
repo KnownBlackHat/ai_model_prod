@@ -359,7 +359,7 @@ export const UI = ({ hidden, meta_ui }) => {
                         className="pointer-events-auto bg-black/70 flex justify-between text-white p-3 rounded-xl shadow-lg  transition-all"
                     >
                         <div className="flex items-center justify-center space-x-5">
-                            <img src={localStorage.getItem('pic')} className="rounded-full size-14 items-center justify-center border-2 border-white" />
+                            <img src={localStorage.getItem('pic')} className="rounded-full size-12 items-center justify-center border-2 border-white" />
                             <button
                                 onClick={() => setSidebarOpen(!sidebarOpen)}
                             >
