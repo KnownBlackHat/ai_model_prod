@@ -58,7 +58,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function get_username() {
         setUsername(localStorage.getItem("name"));
-        return username;
+        return localStorage.getItem("name");
 
     }
 
@@ -95,12 +95,8 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function handleChatCreation(store = false) {
-        let usr_name;
-        if (!username) {
-            usr_name = await get_username()
-        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids/create`,
+            `${import.meta.env.VITE_BACKENDADDR}/${localStorage.getItem("name")}/ids/create`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -122,12 +118,8 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function refreshChatIds() {
-        let usr_name;
-        if (!username) {
-            usr_name = await get_username()
-        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids`,
+            `${import.meta.env.VITE_BACKENDADDR}/${localStorage.getItem("name")}/ids`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -390,7 +382,7 @@ export const UI = ({ hidden, meta_ui }) => {
                             {chatHistory.map((item, idx) => {
                                 return <div key={idx}>
                                     {item.user &&
-                                        <div className="flex text-white justify-between overflow-scroll">
+                                        <div className="flex text-white justify-between  overflow-hidden">
                                             <div className="text-right m-2 bg-slate-800" />
                                             <div className="text-right m-2 bg-slate-700 p-2 rounded-lg flex-col">
                                                 <div>
@@ -405,7 +397,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                     }
 
                                     {item.assistant &&
-                                        <div className="flex justify-between text-white overflow-scroll ">
+                                        <div className="flex justify-between text-white overflow-hidden ">
                                             <div className="text-left m-2 bg-slate-700 p-2 rounded-lg">
                                                 {item.assistant && JSON.parse(item.assistant).map(item => item.text).join("\n")}
                                             </div>
@@ -444,41 +436,45 @@ export const UI = ({ hidden, meta_ui }) => {
                                 />
                             )}
 
-                            {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
-                                <>
-                                    {audioState === "idle" ? (
-                                        <button
-                                            className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
-                                            onClick={speechRecon}
-                                        >
-                                            <FaMicrophoneAlt />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className="text-2xl bg-red-500 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-600"
-                                            onClick={MicStop}
-                                        >
-                                            <FaMicrophoneAltSlash />
-                                        </button>
+                            <div>
+                                <div className="flex space-x-3">
+                                    {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
+                                        <>
+                                            {audioState === "idle" ? (
+                                                <button
+                                                    className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
+                                                    onClick={speechRecon}
+                                                >
+                                                    <FaMicrophoneAlt />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="text-2xl bg-red-500 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-600"
+                                                    onClick={MicStop}
+                                                >
+                                                    <FaMicrophoneAltSlash />
+                                                </button>
+                                            )}
+                                        </>
                                     )}
-                                </>
-                            )}
 
-                            {audioState === "idle" && (
-                                <div>
-                                    <button
-                                        disabled={loading || message}
-                                        onClick={sendMessage}
-                                        className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
-                                            }`}
-                                    >
-                                        <IoSendSharp />
-                                    </button>
-                                    <div className="text-xs text-center mt-2 text-blue-200">
-                                        Credits: {curCredit}/{maxCredit}
-                                    </div>
+                                    {audioState === "idle" && (
+                                        <div>
+                                            <button
+                                                disabled={loading || message}
+                                                onClick={sendMessage}
+                                                className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
+                                                    }`}
+                                            >
+                                                <IoSendSharp />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                                <div className="text-xs text-center mt-2 text-blue-200">
+                                    Credits: {curCredit}/{maxCredit}
+                                </div>
+                            </div>
                         </div>
                         <div className="flex items-center justify-center mt-6">
                             <div className="relative inline-block">
