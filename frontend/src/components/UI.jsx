@@ -12,8 +12,8 @@ import { MdDeleteOutline } from "react-icons/md";
 import { ErrorBoundary } from "react-error-boundary";
 
 
-const WAKE_WORD = ["niva", " va ", "liva"];
-const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
+const WAKE_WORD = ["niva", " va ", "liva", "nibha", "nivba", "eva ",];
+// const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 export const UI = ({ hidden, meta_ui }) => {
     const input = useRef();
@@ -235,6 +235,9 @@ export const UI = ({ hidden, meta_ui }) => {
 
             window.rec.onresult = (e) => {
                 speech = Array.from(e.results).map((result) => result[0].transcript).join("");
+                for (i in WAKE_WORD) {
+                    speech.replace(i, 'Niva')
+                }
                 setSpeechCaption(speech);
                 meta_ui.setAnimation("Listening_1");
             };
