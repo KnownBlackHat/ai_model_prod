@@ -58,7 +58,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
     async function get_username() {
         setUsername(localStorage.getItem("name"));
-        return username;
+        return localStorage.getItem("name");
 
     }
 
@@ -95,12 +95,8 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function handleChatCreation(store = false) {
-        let usr_name;
-        if (!username) {
-            usr_name = await get_username()
-        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids/create`,
+            `${import.meta.env.VITE_BACKENDADDR}/${localStorage.getItem("name")}/ids/create`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -122,12 +118,8 @@ export const UI = ({ hidden, meta_ui }) => {
     }
 
     async function refreshChatIds() {
-        let usr_name;
-        if (!username) {
-            usr_name = await get_username()
-        }
         const resp = await fetch(
-            `${import.meta.env.VITE_BACKENDADDR}/${username ?? usr_name}/ids`,
+            `${import.meta.env.VITE_BACKENDADDR}/${localStorage.getItem("name")}/ids`,
             {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
