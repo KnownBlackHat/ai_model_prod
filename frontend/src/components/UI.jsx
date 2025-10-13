@@ -444,41 +444,45 @@ export const UI = ({ hidden, meta_ui }) => {
                                 />
                             )}
 
-                            {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
-                                <>
-                                    {audioState === "idle" ? (
-                                        <button
-                                            className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
-                                            onClick={speechRecon}
-                                        >
-                                            <FaMicrophoneAlt />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            className="text-2xl bg-red-500 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-600"
-                                            onClick={MicStop}
-                                        >
-                                            <FaMicrophoneAltSlash />
-                                        </button>
+                            <div>
+                                <div className="flex space-x-3">
+                                    {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
+                                        <>
+                                            {audioState === "idle" ? (
+                                                <button
+                                                    className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
+                                                    onClick={speechRecon}
+                                                >
+                                                    <FaMicrophoneAlt />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="text-2xl bg-red-500 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-600"
+                                                    onClick={MicStop}
+                                                >
+                                                    <FaMicrophoneAltSlash />
+                                                </button>
+                                            )}
+                                        </>
                                     )}
-                                </>
-                            )}
 
-                            {audioState === "idle" && (
-                                <div>
-                                    <button
-                                        disabled={loading || message}
-                                        onClick={sendMessage}
-                                        className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
-                                            }`}
-                                    >
-                                        <IoSendSharp />
-                                    </button>
-                                    <div className="text-xs text-center mt-2 text-blue-200">
-                                        Credits: {curCredit}/{maxCredit}
-                                    </div>
+                                    {audioState === "idle" && (
+                                        <div>
+                                            <button
+                                                disabled={loading || message}
+                                                onClick={sendMessage}
+                                                className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${loading || message ? "cursor-not-allowed bg-gray-500 opacity-30" : ""
+                                                    }`}
+                                            >
+                                                <IoSendSharp />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                                <div className="text-xs text-center mt-2 text-blue-200">
+                                    Credits: {curCredit}/{maxCredit}
+                                </div>
+                            </div>
                         </div>
                         <div className="flex items-center justify-center mt-6">
                             <div className="relative inline-block">
