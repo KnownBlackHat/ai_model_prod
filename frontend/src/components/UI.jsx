@@ -390,7 +390,7 @@ export const UI = ({ hidden, meta_ui }) => {
                             {chatHistory.map((item, idx) => {
                                 return <div key={idx}>
                                     {item.user &&
-                                        <div className="flex text-white justify-between overflow-scroll">
+                                        <div className="flex text-white justify-between  overflow-hidden">
                                             <div className="text-right m-2 bg-slate-800" />
                                             <div className="text-right m-2 bg-slate-700 p-2 rounded-lg flex-col">
                                                 <div>
@@ -405,7 +405,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                     }
 
                                     {item.assistant &&
-                                        <div className="flex justify-between text-white overflow-scroll ">
+                                        <div className="flex justify-between text-white overflow-hidden ">
                                             <div className="text-left m-2 bg-slate-700 p-2 rounded-lg">
                                                 {item.assistant && JSON.parse(item.assistant).map(item => item.text).join("\n")}
                                             </div>
