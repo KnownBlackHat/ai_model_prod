@@ -152,7 +152,7 @@ app.post('/login', async (req: Request, res: Response): Promise<any> => {
   //   return res.status(401).send({error: 'Invalid credentials'});
   // }
 
-  const token = jwt.sign({ email: user?.email }, secret, { expiresIn: '1h' });
+  const token = jwt.sign({ email: user?.email }, secret, { expiresIn: '7d' });
   res.send({ token });
 });
 
