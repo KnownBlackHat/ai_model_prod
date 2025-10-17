@@ -324,7 +324,7 @@ export const UI = ({ hidden, meta_ui }) => {
                             <div className="flex space-y-4 flex-col overflow-y-scroll">
                                 {chatIds.map((value) =>
                                     <div className="bg-slate-700 text-white p-2 text-center rounded-md flex justify-between items-center">
-                                        <Link to={`/chat/${value}`}> {value}</Link>
+                                        <Link to={`/chat/${value.id}`}> {value.gist}</Link>
                                         <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value)} />
                                     </div>
                                 )}
