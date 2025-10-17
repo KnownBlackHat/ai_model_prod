@@ -6,6 +6,11 @@ interface AiResponse {
   lipsync?: string;
 }
 
+interface Gist {
+  user: string;
+  gist: string;
+}
+
 interface Embeds {
   name: String;
   value: String;
