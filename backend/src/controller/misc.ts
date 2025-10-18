@@ -1,5 +1,5 @@
 import {Db} from 'mongodb';
-import {singular_chat} from './interaction';
+import {summarizer} from './interaction';
 
 export async function get_gist_name(db: Db, id: string): Promise<string> {
   const collection = db.collection(`his-${id}`);
@@ -9,6 +9,6 @@ export async function get_gist_name(db: Db, id: string): Promise<string> {
   for (const msg of user) {
     msgs.push(msg?.user || '');
   }
-  const gist = await singular_chat(msgs.join('.'));
+  const gist = await summarizer(msgs.join('.'));
   return gist;
 }
