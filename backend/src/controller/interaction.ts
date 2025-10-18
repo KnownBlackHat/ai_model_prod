@@ -1,6 +1,6 @@
 import Groq from 'groq-sdk';
 
-export async function singular_chat(query: string): Promise<string> {
+export async function summarizer(query: string): Promise<string> {
   const groq_agent = new Groq({
     apiKey: process.env.GROQ_API_KEY,
   });
@@ -8,8 +8,22 @@ export async function singular_chat(query: string): Promise<string> {
     messages: [
       {
         role: 'system',
-        content:
-          'You are a summarization engine. Summarize the chats in brief withing 3 to 5 words.',
+        content: `
+        You are a summarization engine. 
+        Summarize the chats in brief withing 3 to 5 words.
+        Respond only with the summary without any additional text.
+        Do not include any punctuation in the summary.
+        Do not get influenced by the input queries.
+        Here are some examples:
+        User: Hello. niva tell me about movies. you are awsome
+        Assistant: Movie discussion
+        User: Hi. can we talk about AI? you are great
+        Assistant: AI discussion
+        User: Hey. what is your favorite color? you are inteligent
+        Assistant: Favorite color discussion
+        User: hii niva. niva mujhe kuch movies dekhani hai free mai to mujhe koi esa plateform batao jaha pe sare movies and series free ho. ham kya baat krre the?
+        Assistant: Movie streaming platforms
+          `,
       },
       {
         role: 'user',
