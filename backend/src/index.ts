@@ -15,6 +15,7 @@ import jwt from 'jsonwebtoken';
 import { expend_credit, get_credit } from './controller/credits';
 import { get_gist_name } from './controller/misc';
 import { login, signup } from './controller/user';
+import { create_ids, get_ids } from './controller/conversation';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -156,26 +157,7 @@ app.get('/:user/ids', async (req, res) => {
       error: 'db not found',
     });
   } else {
-    const col = db.collection('ids');
-    const ids = await col
-      .find({
-        user: req.params.user,
-      })
-      .sort({ _id: -1 })
-      .toArray();
-
-    const ids_arr = [];
-    for (const id of ids) {
-      if (id.user === req.params.user) {
-        if (!id.gist) {
-          const gist = await get_gist_name(db, `${id._id}`);
-          await col.findOneAndUpdate({ _id: id._id }, { $set: { gist: gist } });
-          id.gist = gist;
-        }
-        ids_arr.push({ id: id._id, gist: id.gist });
-      }
-    }
-    res.send(ids_arr);
+    return await get_ids(req.params.user, res);
   }
 });
 
@@ -185,15 +167,7 @@ app.get('/:user/ids/create', async (req, res) => {
       error: 'db not found',
     });
   } else {
-    const col = db.collection('ids');
-    const resp = await col.insertOne({
-      user: req.params.user,
-    });
-
-    res.send({
-      status: 'ok',
-      id: resp.insertedId,
-    });
+    return create_ids(req.params.user, res);
   }
 });
 

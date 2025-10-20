@@ -1,13 +1,12 @@
-import jwt from 'jsonwebtoken';
-import {Response} from 'express';
-import {PrismaClient} from '@prisma/client';
-import {summarizer} from './interaction';
+import { Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import { summarizer } from './interaction';
 
 const prisma = new PrismaClient();
 
 export async function get_ids(username: string, resp: Response) {
   const user = await prisma.user.findFirst({
-    where: {username},
+    where: { username },
     include: {
       conversations: {
         orderBy: {
@@ -18,7 +17,7 @@ export async function get_ids(username: string, resp: Response) {
   });
 
   if (!user) {
-    return resp.status(404).send({error: 'User Not Found'});
+    return resp.status(404).send({ error: 'User Not Found' });
   }
 
   const ids_arr = [];
@@ -46,7 +45,31 @@ export async function get_ids(username: string, resp: Response) {
       });
     }
 
-    ids_arr.push({id: conv.id, gist: conv.gist});
+    ids_arr.push({ id: conv.id, gist: conv.gist });
   }
   return resp.send(ids_arr);
+}
+
+export async function create_ids(username: string, resp: Response) {
+  const user = await prisma.user.findFirst({
+    where: {
+      username,
+    },
+  });
+
+  if (!user) {
+    return resp.status(404).send({ error: 'User Not Found' });
+  }
+
+  const conv = await prisma.conversation.create({
+    data: {
+      userEmail: user.email,
+      gist: null,
+    },
+  });
+
+  return resp.send({
+    status: 'ok',
+    id: conv.id,
+  });
 }

@@ -19,19 +19,19 @@ model User {
 }
 
 model Conversation {
-  id        String     @id @map("_id") @db.ObjectId
+  id        String     @id @map("_id") @db.ObjectId @default(auto())
   user      User       @relation(fields: [userEmail], references: [email])
   userEmail String
   gist      String?
   createdAt DateTime   @default(now())
   Messages  Messages[]
-  count     Int
+  count     Int        @default(0)
 
   @@index([userEmail])
 }
 
 model Credits {
-  id        String @id @map("_id") @db.ObjectId
+  id        String @id @map("_id") @db.ObjectId @default(auto())
   user      User   @relation(fields: [userEmail], references: [email])
   userEmail String
   amount    Int    @default(100)
@@ -45,7 +45,7 @@ enum Role {
 }
 
 model Messages {
-  id             String       @id @map("_id") @db.ObjectId
+  id             String       @id @map("_id") @db.ObjectId @default(auto())
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String       @db.ObjectId
   role           Role
