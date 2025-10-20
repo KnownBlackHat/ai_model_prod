@@ -8,7 +8,6 @@ import express, {
   RequestHandler,
 } from 'express';
 
-import { Db, MongoClient } from 'mongodb';
 import { streamToBase64 } from './helper';
 import { groq } from './llm_interface';
 import jwt from 'jsonwebtoken';
@@ -16,6 +15,7 @@ import { expend_credit, get_credit } from './controller/credits';
 import { login, signup } from './controller/user';
 import { create_ids, delete_ids, get_ids } from './controller/conversation';
 import { get_messages } from './controller/message';
+import { prisma } from './constants';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -26,13 +26,9 @@ const elevenlab = new ElevenLabsClient({
 const url = process.env.MONGO_URL;
 if (!url) throw new Error('Mongo db url not found');
 
-const client = new MongoClient(url);
-let db: Db | undefined = undefined;
-
 async function run() {
   try {
-    await client.connect();
-    db = client.db('ai_chat_history');
+    await prisma.$connect();
     console.log('connected to db');
   } catch (err) {
     console.log('Failed to connect');
@@ -103,12 +99,6 @@ app.post('/signup', async (req: Request, res: Response): Promise<any> => {
     });
   }
 
-  if (!db) {
-    return res.status(500).send({
-      error: 'Database not found',
-    });
-  }
-
   return await signup(sub, email, name, res);
 });
 
@@ -121,9 +111,6 @@ app.post('/login', async (req: Request, res: Response): Promise<any> => {
     return res.status(400).send({ error: 'email and sub are required' });
   }
 
-  if (!db) {
-    return res.status(500).send({ error: 'Database not found' });
-  }
   return await login(email, sub, res);
 });
 
@@ -135,43 +122,19 @@ app.post('/login', async (req: Request, res: Response): Promise<any> => {
 // });
 
 app.get('/history/:id', async (req, res) => {
-  if (!db) {
-    res.send({
-      error: 'db bot found',
-    });
-  } else {
-    await get_messages(req.params.id, res);
-  }
+  await get_messages(req.params.id, res);
 });
 
 app.get('/:user/ids', async (req, res) => {
-  if (!db) {
-    res.send({
-      error: 'db not found',
-    });
-  } else {
-    await get_ids(req.params.user, res);
-  }
+  await get_ids(req.params.user, res);
 });
 
 app.get('/:user/ids/create', async (req, res) => {
-  if (!db) {
-    res.send({
-      error: 'db not found',
-    });
-  } else {
-    await create_ids(req.params.user, res);
-  }
+  await create_ids(req.params.user, res);
 });
 
 app.get('/:user/:id/delete', async (req, res) => {
-  if (!db) {
-    res.send({
-      error: 'db not found',
-    });
-  } else {
-    await delete_ids(req.params.user, req.params.id, res);
-  }
+  await delete_ids(req.params.user, req.params.id, res);
 });
 
 app.post('/chat/:id', async (req, res) => {
@@ -241,11 +204,6 @@ app.get('/credits', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   const decoded = jwt.verify(token || '', secret || '') as { email: string };
-  if (!db) {
-    res.send({
-      error: 'db not found',
-    });
-  }
   await get_credit(decoded.email, res);
 });
 

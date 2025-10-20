@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken';
-import {Response} from 'express';
-import {PrismaClient} from '@prisma/client';
+import { Response } from 'express';
+import { prisma } from '../constants';
 
-const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || '';
 
 export async function signup(
@@ -42,11 +41,11 @@ export async function signup(
 
 export async function login(email: string, subid: string, resp: Response) {
   const user = await prisma.user.findFirst({
-    where: {email, subid},
+    where: { email, subid },
   });
   if (user) {
-    const token = jwt.sign({email: user?.email}, secret, {expiresIn: '7d'});
-    return resp.send({token});
+    const token = jwt.sign({ email: user?.email }, secret, { expiresIn: '7d' });
+    return resp.send({ token });
   } else {
     return resp.status(404).send({
       error: 'User Not Found',

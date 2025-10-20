@@ -1,7 +1,5 @@
 import { Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../constants';
 
 export async function get_credit(email: string, resp: Response) {
   const credits = prisma.credits.findMany({
