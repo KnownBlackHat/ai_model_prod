@@ -5,3 +5,5 @@ build
 audios/*.wav
 audios/*.json
 core
+
+/src/generated/prisma

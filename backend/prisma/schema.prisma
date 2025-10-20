@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+model User {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  subid         String
+  email         String         @unique
+  username      String
+  conversations Conversation[]
+  Credits       Credits[]
+  createdAt     DateTime       @default(now())
+}
+
+model Conversation {
+  id        String     @id @map("_id") @db.ObjectId
+  user      User       @relation(fields: [userEmail], references: [email])
+  userEmail String
+  gist      String?
+  createdAt DateTime   @default(now())
+  Messages  Messages[]
+  count     Int
+
+  @@index([userEmail])
+}
+
+model Credits {
+  id        String @id @map("_id") @db.ObjectId
+  user      User   @relation(fields: [userEmail], references: [email])
+  userEmail String
+  amount    Int    @default(100)
+
+  @@index([userEmail])
+}
+
+enum Role {
+  User
+  Assistant
+}
+
+model Messages {
+  id             String       @id @map("_id") @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  conversationId String       @db.ObjectId
+  role           Role
+  timestamp      DateTime     @default(now())
+  content        String
+
+  @@index([timestamp, conversationId])
+}
