@@ -16,6 +16,7 @@ import {expend_credit, get_credit} from './controller/credits';
 import {get_gist_name} from './controller/misc';
 import {login, signup} from './controller/user';
 import {create_ids, delete_ids, get_ids} from './controller/conversation';
+import {get_messages} from './controller/message';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -140,14 +141,7 @@ app.get('/history/:id', async (req, res) => {
       error: 'db bot found',
     });
   } else {
-    const col = db.collection(`his-${req.params.id}`);
-    const history = await col
-      .find({})
-      .sort({
-        _id: 1,
-      })
-      .toArray();
-    res.send(history);
+    await get_messages(req.params.id, res);
   }
 });
 
@@ -256,15 +250,6 @@ app.get('/credits', async (req, res) => {
   res.send({
     credits: await get_credit(db as Db, decoded.username),
   });
-});
-
-app.get('/gist_name/:id', async (req, res) => {
-  if (!db) {
-    res.send({
-      error: 'db not found',
-    });
-  }
-  await get_gist_name(db as Db, req.params.id);
 });
 
 app.listen(port, async () => {
