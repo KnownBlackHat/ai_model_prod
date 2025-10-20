@@ -1,4 +1,4 @@
-import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, {
@@ -8,13 +8,13 @@ import express, {
   RequestHandler,
 } from 'express';
 
-import {Db, MongoClient} from 'mongodb';
-import {streamToBase64} from './helper';
-import {groq} from './llm_interface';
+import { Db, MongoClient } from 'mongodb';
+import { streamToBase64 } from './helper';
+import { groq } from './llm_interface';
 import jwt from 'jsonwebtoken';
-import {expend_credit, get_credit} from './controller/credits';
-import {login, signup} from './controller/user';
-import {create_ids, delete_ids, get_ids } from './controller/conversation';
+import { expend_credit, get_credit } from './controller/credits';
+import { login, signup } from './controller/user';
+import { create_ids, delete_ids, get_ids } from './controller/conversation';
 import { get_messages } from './controller/message';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
@@ -200,7 +200,7 @@ app.post('/chat/:id', async (req, res) => {
   const userMessage = req.body.message;
 
   let stime = new Date().getTime();
-  const messages: AiResponse[] = await groq(userMessage, db, req.params.id);
+  const messages: AiResponse[] = await groq(userMessage, req.params.id);
   console.log(`LLM: ${new Date().getTime() - stime} ms`);
   async function genmetadata(i: number) {
     const stime = new Date().getTime();

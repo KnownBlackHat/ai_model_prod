@@ -1,5 +1,5 @@
-import {Response} from 'express';
-import {PrismaClient} from '@prisma/client';
+import { Response } from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -14,4 +14,32 @@ export async function get_messages(id: string, resp: Response) {
   });
 
   return resp.send(msgs);
+}
+
+export async function get_his_messages(id: string) {
+  const msgs = await prisma.messages.findMany({
+    where: {
+      conversationId: id,
+    },
+    orderBy: {
+      conversationId: 'desc',
+    },
+    take: 20,
+  });
+
+  return msgs;
+}
+
+export async function add_message(
+  id: string,
+  msg: string,
+  role: 'User' | 'Assistant',
+) {
+  await prisma.messages.create({
+    data: {
+      conversationId: id,
+      role,
+      content: msg,
+    },
+  });
 }
