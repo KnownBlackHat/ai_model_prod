@@ -13,10 +13,9 @@ import {streamToBase64} from './helper';
 import {groq} from './llm_interface';
 import jwt from 'jsonwebtoken';
 import {expend_credit, get_credit} from './controller/credits';
-import {get_gist_name} from './controller/misc';
 import {login, signup} from './controller/user';
-import {create_ids, delete_ids, get_ids} from './controller/conversation';
-import {get_messages} from './controller/message';
+import {create_ids, delete_ids, get_ids } from './controller/conversation';
+import { get_messages } from './controller/message';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -56,7 +55,7 @@ const secret = process.env.JWT_SECRET || '';
 const port = 3000;
 
 interface AuthRequest extends Request {
-  user?: {username: string};
+  email?: { email: string };
 }
 
 function asyncHandler<R extends Request = Request>(
@@ -75,16 +74,16 @@ const authenticate = asyncHandler<AuthRequest>(
       const authHeader = req.headers['authorization'];
       const token = authHeader && authHeader.split(' ')[1];
       if (!token) {
-        res.status(401).send({error: 'No token provided'});
+        res.status(401).send({ error: 'No token provided' });
         return;
       }
 
       try {
-        const decoded = jwt.verify(token, secret) as {username: string};
-        req.user = decoded;
+        const decoded = jwt.verify(token, secret) as { email: string };
+        req.email = decoded;
         next();
       } catch (err) {
-        res.status(403).send({error: 'Invalid token'});
+        res.status(403).send({ error: 'Invalid token' });
       }
     }
   },
@@ -93,7 +92,7 @@ const authenticate = asyncHandler<AuthRequest>(
 app.use(authenticate);
 
 app.post('/signup', async (req: Request, res: Response): Promise<any> => {
-  const {email, name, sub} = req.body as {
+  const { email, name, sub } = req.body as {
     email?: string;
     name?: string;
     sub?: string;
@@ -114,16 +113,16 @@ app.post('/signup', async (req: Request, res: Response): Promise<any> => {
 });
 
 app.post('/login', async (req: Request, res: Response): Promise<any> => {
-  const {email, sub} = req.body as {
+  const { email, sub } = req.body as {
     email?: string;
     sub?: string;
   };
   if (!email || !sub) {
-    return res.status(400).send({error: 'email and sub are required'});
+    return res.status(400).send({ error: 'email and sub are required' });
   }
 
   if (!db) {
-    return res.status(500).send({error: 'Database not found'});
+    return res.status(500).send({ error: 'Database not found' });
   }
   return await login(email, sub, res);
 });
@@ -189,8 +188,8 @@ app.post('/chat/:id', async (req, res) => {
 
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  const decoded = jwt.verify(token || '', secret || '') as {username: string};
-  const is_expended = await expend_credit(db as Db, decoded.username, 1);
+  const decoded = jwt.verify(token || '', secret || '') as { email: string };
+  const is_expended = await expend_credit(decoded.email, 1);
   if (!is_expended) {
     res.status(402).send({
       error: 'Not enough credits',
@@ -235,21 +234,19 @@ app.post('/chat/:id', async (req, res) => {
   await Promise.all(task);
 
   console.log(`TTS: ${new Date().getTime() - stime}ms`);
-  res.send({messages});
+  res.send({ messages });
 });
 
 app.get('/credits', async (req, res) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  const decoded = jwt.verify(token || '', secret || '') as {username: string};
+  const decoded = jwt.verify(token || '', secret || '') as { email: string };
   if (!db) {
     res.send({
       error: 'db not found',
     });
   }
-  res.send({
-    credits: await get_credit(db as Db, decoded.username),
-  });
+  await get_credit(decoded.email, res);
 });
 
 app.listen(port, async () => {

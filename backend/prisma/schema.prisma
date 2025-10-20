@@ -19,7 +19,7 @@ model User {
 }
 
 model Conversation {
-  id        String     @id @map("_id") @db.ObjectId @default(auto())
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
   user      User       @relation(fields: [userEmail], references: [email])
   userEmail String
   gist      String?
@@ -31,12 +31,10 @@ model Conversation {
 }
 
 model Credits {
-  id        String @id @map("_id") @db.ObjectId @default(auto())
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
   user      User   @relation(fields: [userEmail], references: [email])
-  userEmail String
-  amount    Int    @default(100)
-
-  @@index([userEmail])
+  userEmail String @unique
+  credits   Int    @default(100)
 }
 
 enum Role {
@@ -45,7 +43,7 @@ enum Role {
 }
 
 model Messages {
-  id             String       @id @map("_id") @db.ObjectId @default(auto())
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String       @db.ObjectId
   role           Role
