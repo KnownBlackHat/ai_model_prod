@@ -1,7 +1,11 @@
 {
+    "files": [
+    "dist",
+    "generated/"],
   "dependencies": {
     "@elevenlabs/elevenlabs-js": "^2.11.0",
     "@google/generative-ai": "^0.21.0",
+    "@prisma/client": "6.17.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.3",
@@ -16,6 +20,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.18.0",
     "nodemon": "^3.1.7",
+    "prisma": "^6.17.1",
     "wikipedia": "^2.1.2"
   },
   "devDependencies": {

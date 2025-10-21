@@ -1,33 +1,32 @@
-import { Db } from 'mongodb';
+import {Response} from 'express';
+import {prisma} from '../constants';
 
-export async function get_credit(db: Db, username: string): Promise<number> {
-  const usersCol = db.collection('users');
-  const user = (await usersCol.findOne({
-    username,
-  })) as {
-    username: string;
-    password: string;
-    credits: number;
-  } | null;
-  return user?.credits || 0;
+export async function get_credit(email: string, resp: Response) {
+  const credits = await prisma.credits.findUnique({
+    where: {
+      userEmail: email,
+    },
+  });
+  return resp.send(credits);
 }
 
 export async function expend_credit(
-  db: Db,
-  username: string,
-  amount = 1,
+  email: string,
+  amount: number,
 ): Promise<boolean> {
-  const usersCol = db.collection('users');
-  const user = (await usersCol.findOne({
-    username,
-  })) as {
-    username: string;
-    password: string;
-    credits: number;
-  } | null;
-  if (!user || user.credits < amount) {
+  const credit = await prisma.credits.update({
+    where: {
+      userEmail: email,
+    },
+    data: {
+      credits: {
+        decrement: amount,
+      },
+    },
+  });
+
+  if (credit.credits <= 0) {
     return false;
   }
-  await usersCol.updateOne({ username }, { $inc: { credits: -amount } });
   return true;
 }

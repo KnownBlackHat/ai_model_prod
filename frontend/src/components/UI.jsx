@@ -325,7 +325,7 @@ export const UI = ({ hidden, meta_ui }) => {
                                 {chatIds.map((value) =>
                                     <div className="bg-slate-700 text-white p-2 text-center rounded-md flex justify-between items-center">
                                         <Link to={`/chat/${value.id}`}> {value.gist}</Link>
-                                        <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value)} />
+                                        <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value.id)} />
                                     </div>
                                 )}
                             </div>
@@ -388,8 +388,8 @@ export const UI = ({ hidden, meta_ui }) => {
                                                     {item.user}
                                                 </div>
                                                 <div className="text-xs text-gray-400">
-                                                    {(new Date(item.date)).getHours()}:
-                                                    {(new Date(item.date)).getMinutes()}
+                                                    {(new Date(item.createdAt)).getHours()}:
+                                                    {(new Date(item.createdAt)).getMinutes()}
                                                 </div>
                                             </div>
                                         </div>
