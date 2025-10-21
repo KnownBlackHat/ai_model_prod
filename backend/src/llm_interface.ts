@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { ChatCompletionMessageParam } from 'groq-sdk/resources/chat/completions';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { parse, checkKeys, report_discord, wikipedia } from './helper';
+import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
+import {GoogleGenerativeAI} from '@google/generative-ai';
+import {parse, checkKeys, report_discord, wikipedia} from './helper';
 import Groq from 'groq-sdk';
-import { Db } from 'mongodb';
-import { add_message, get_his_messages } from './controller/message';
+import {add_message, get_his_messages} from './controller/message';
 
 const groq_agent = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -66,9 +65,16 @@ function groq_history_builder(dblist: Dblist[]): ChatCompletionMessageParam[] {
 }
 
 export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
+  if (id === '1') {
+    return {
+      text: '',
+      facialExpression: '',
+      animation: '',
+    } as unknown as AiResponse[];
+  }
   const history = await get_his_messages(id);
   const obj = groq_history_builder(history as unknown as Dblist[]);
-  console.log(obj);
+  console.log('obj: ', obj);
   const completion = await groq_agent.chat.completions.create({
     messages: [
       {
@@ -145,8 +151,7 @@ export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
     checkKeys(response);
     console.log('groq: ', response);
     await report_discord(query, JSON.stringify(response), false);
-    await add_message(id, query, 'User');
-    await add_message(id, JSON.stringify(response), 'Assistant');
+    await add_message(id, query, JSON.stringify(response));
     return response;
   } catch (e) {
     console.log('error:', e);

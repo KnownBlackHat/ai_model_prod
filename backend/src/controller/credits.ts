@@ -1,8 +1,8 @@
-import { Response } from 'express';
-import { prisma } from '../constants';
+import {Response} from 'express';
+import {prisma} from '../constants';
 
 export async function get_credit(email: string, resp: Response) {
-  const credits = prisma.credits.findMany({
+  const credits = await prisma.credits.findUnique({
     where: {
       userEmail: email,
     },

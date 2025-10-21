@@ -1,10 +1,10 @@
-import { Response } from 'express';
-import { summarizer } from './interaction';
-import { prisma } from '../constants';
+import {Response} from 'express';
+import {summarizer} from './interaction';
+import {prisma} from '../constants';
 
 export async function get_ids(username: string, resp: Response) {
   const user = await prisma.user.findFirst({
-    where: { username },
+    where: {username},
     include: {
       conversations: {
         orderBy: {
@@ -15,35 +15,46 @@ export async function get_ids(username: string, resp: Response) {
   });
 
   if (!user) {
-    return resp.status(404).send({ error: 'User Not Found' });
+    return resp.status(404).send({error: 'User Not Found'});
   }
 
   const ids_arr = [];
   for (const conv of user.conversations) {
-    if (conv.count >= 3) {
-      const msgs = await prisma.messages.findMany({
-        where: {
-          conversationId: conv.id,
-          role: 'User',
-        },
-      });
-      const msgs_line = [];
-      for (const msg of msgs) {
-        msgs_line.push(msg.content);
+    if (conv.count <= 3) {
+      const real_count =
+        (await prisma.messages.count({
+          where: {
+            conversationId: conv.id,
+          },
+        })) - 1;
+      if (conv.count !== real_count) {
+        const msgs = await prisma.messages.findMany({
+          where: {
+            conversationId: conv.id,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+          take: 3,
+        });
+        const msgs_line = [];
+        for (const msg of msgs) {
+          msgs_line.push(msg.user);
+        }
+        const gist = await summarizer(msgs_line.join('. '));
+        conv.gist = gist;
+        await prisma.conversation.update({
+          where: {
+            id: conv.id,
+          },
+          data: {
+            gist,
+          },
+        });
       }
-      const gist = await summarizer(msgs_line.join('. '));
-      conv.gist = gist;
-      await prisma.conversation.update({
-        where: {
-          id: conv.id,
-        },
-        data: {
-          gist,
-        },
-      });
     }
 
-    ids_arr.push({ id: conv.id, gist: conv.gist });
+    ids_arr.push({id: conv.id, gist: conv.gist});
   }
   return resp.send(ids_arr);
 }
@@ -56,7 +67,7 @@ export async function create_ids(username: string, resp: Response) {
   });
 
   if (!user) {
-    return resp.status(404).send({ error: 'User Not Found' });
+    return resp.status(404).send({error: 'User Not Found'});
   }
 
   const conv = await prisma.conversation.create({
@@ -80,18 +91,23 @@ export async function delete_ids(username: string, id: string, resp: Response) {
   });
 
   if (!user) {
-    return resp.status(404).send({ error: 'User Not Found' });
+    return resp.status(404).send({error: 'User Not Found'});
   }
-  await prisma.conversation.delete({
-    where: {
-      id: id,
-    },
+
+  await prisma.$transaction(async tx => {
+    await tx.messages.deleteMany({
+      where: {
+        conversationId: id,
+      },
+    });
+
+    await tx.conversation.delete({
+      where: {
+        id: id,
+      },
+    });
   });
-  await prisma.messages.deleteMany({
-    where: {
-      conversationId: id,
-    },
-  });
+
   return resp.send({
     status: 'ok',
   });

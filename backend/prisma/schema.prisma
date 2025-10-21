@@ -46,9 +46,9 @@ model Messages {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   conversationId String       @db.ObjectId
-  role           Role
-  timestamp      DateTime     @default(now())
-  content        String
+  createdAt      DateTime     @default(now())
+  user           String
+  assistant      String
 
-  @@index([timestamp, conversationId])
+  @@index([createdAt, conversationId])
 }

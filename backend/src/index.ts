@@ -23,9 +23,6 @@ const elevenlab = new ElevenLabsClient({
   apiKey: process.env.ELEVEN_LABS_API_KEY,
 });
 
-const url = process.env.MONGO_URL;
-if (!url) throw new Error('Mongo db url not found');
-
 async function run() {
   try {
     await prisma.$connect();
