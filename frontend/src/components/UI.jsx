@@ -226,7 +226,7 @@ export const UI = ({ hidden, meta_ui }) => {
             window.rec.interimResults = true;
             window.rec.continuous = true;
 
-            window.rec.addEventListener("error", (e) => console.log("Recognition error:", e.error, e.message));
+            window.rec.addEventListener("error", (e) => console.log("Recognition error:", e.error, e));
             window.rec.addEventListener("nomatch", () => console.log("No speech detected"));
 
 
