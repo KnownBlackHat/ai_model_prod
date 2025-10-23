@@ -224,8 +224,14 @@ export const UI = ({ hidden, meta_ui }) => {
             window.rec = new recApi();
             window.rec.lang = "en-IN";
             window.rec.interimResults = true;
+            window.rec.continuous = true;
+
+            window.rec.addEventListener("error", (e) => console.log("Recognition error:", e.error, e.message));
+            window.rec.addEventListener("nomatch", () => console.log("No speech detected"));
+
 
             window.rec.onresult = (e) => {
+                console.log('res: ', e)
                 speech = Array.from(e.results).map((result) => result[0].transcript).join("");
                 for (i in WAKE_WORD) {
                     speech.replace(i, 'Niva')
@@ -236,8 +242,10 @@ export const UI = ({ hidden, meta_ui }) => {
 
             window.rec.start();
             setaudioState("listen");
+            window.rec.addEventListener("start", () => console.log("rec started"))
 
-            window.rec.addEventListener("end", () => {
+            window.rec.addEventListener("end", (e) => {
+                console.log("end: ", e)
                 if (WAKE_WORD.some((word) => speech.toLowerCase().includes(word))) {
                     speechReconCleanup(speech);
                     speech = "";
@@ -437,7 +445,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
                             <div>
                                 <div className="flex space-x-3">
-                                    {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
+                                    {(true || window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
                                         <>
                                             {audioState === "idle" ? (
                                                 <button
