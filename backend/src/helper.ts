@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { exec } from 'child_process';
+import {exec} from 'child_process';
 import wiki from 'wikipedia';
-import * as fs from 'fs';
+import fs from 'fs/promises';
 
 export function checkKeys(response: AiResponse[]) {
   const fields = ['text', 'facialExpression', 'animation'];
@@ -26,7 +26,7 @@ export async function streamToBase64(stream: ReadableStream) {
 
   let done, value;
 
-  while ((({ done, value } = await reader.read()), !done)) {
+  while ((({done, value} = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -86,7 +86,7 @@ export async function report_discord(
 
 export async function parse(file_path: string) {
   // eslint-disable-next-line n/no-unsupported-features/node-builtins
-  const data = await fs.promises.readFile(file_path);
+  const data = await fs.readFile(file_path);
   const parsed = JSON.parse(data.toString());
   return parsed;
 }
@@ -156,12 +156,15 @@ async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
   }
 }
 
-const lipSyncMessage = async (message: string) => {
+export async function lipSyncMessage(message: string) {
   await execCommand(
-    `./ bin / rhubarb - f json - o audios / message_${message}.json audios / message_${message}.wav - r phonetic`,
+    `ffmpeg -y -i audios/_${message}.wav audios/message_${message}.wav | tee log`,
+  );
+  await execCommand(
+    `./bin/rhubarb -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`,
   );
   // -r phonetic is faster but less accurate
-};
+}
 
 const execCommand = (command: string) => {
   return new Promise((resolve, reject) => {
@@ -172,7 +175,7 @@ const execCommand = (command: string) => {
   });
 };
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
+export function arrayBufferToBase64(buffer: ArrayBuffer) {
   let binary = '';
   const bytes = new Uint8Array(buffer);
   const len = bytes.length;
@@ -184,11 +187,42 @@ function arrayBufferToBase64(buffer: ArrayBuffer) {
   return btoa(binary);
 }
 
-// async function readJsonTranscript(file: string) {
-//   return JSON.parse(fs.readFile(file, 'utf8') || '');
-// }
+export async function readJsonTranscript(file: string) {
+  return JSON.parse(await fs.readFile(file, 'utf8'));
+}
 
 // const audioFileToBase64 = async (file: string) => {
 //   const data = fs.readFile(file);
 //   return data.toString('base64');
 // };
+
+// Assuming TypeScript for type safety; works in plain JS too (remove types)
+export async function streamToArrayBufferView(
+  stream: ReadableStream<Uint8Array>,
+): Promise<Uint8Array> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+
+  try {
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      if (value) chunks.push(value); // Skip empty chunks if any
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  // Calculate total size and concatenate
+  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  if (totalLength === 0) return new Uint8Array(0);
+
+  const buffer = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    buffer.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return buffer;
+}

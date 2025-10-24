@@ -27,6 +27,7 @@ export async function get_ids(username: string, resp: Response) {
             conversationId: conv.id,
           },
         })) - 1;
+      console.log(real_count, conv.count);
       if (conv.count !== real_count) {
         const msgs = await prisma.messages.findMany({
           where: {
