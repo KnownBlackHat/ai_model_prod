@@ -156,12 +156,12 @@ async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
   }
 }
 
-export async function lipSyncMessage(message: string) {
+export async function lipSyncMessage(message: string, id: string) {
   await execCommand(
-    `ffmpeg -y -i audios/_${message}.wav audios/message_${message}.wav | tee log`,
+    `ffmpeg -y -i audios/${id}_${message}.wav audios/_${id}_${message}.wav | tee log`,
   );
   await execCommand(
-    `./bin/rhubarb -f json -o audios/message_${message}.json audios/message_${message}.wav -r phonetic`,
+    `./bin/rhubarb -f json -o audios/_${id}_${message}.json audios/_${id}_${message}.wav -r phonetic`,
   );
   // -r phonetic is faster but less accurate
 }

@@ -179,7 +179,7 @@ app.post('/chat/:id', async (req, res) => {
       outputFormat: 'mp3_44100_128',
     });
 
-    const fileName = `audios/_${i}.wav`;
+    const fileName = `audios/${req.params.id}_${i}.wav`;
     const audioBuffer = await streamToArrayBufferView(audio);
     try {
       await fs.writeFile(fileName, audioBuffer);
@@ -188,13 +188,13 @@ app.post('/chat/:id', async (req, res) => {
     }
     // const arrayBuffer = await blob.arrayBuffer();
     // const base64String = arrayBufferToBase64(arrayBuffer);
-    console.log('starting lipsync');
 
-    await lipSyncMessage(i.toString());
-    console.log('complete lipsync');
+    await lipSyncMessage(i.toString(), req.params.id);
 
     message.audio = Buffer.from(audioBuffer).toString('base64');
-    message.lipsync = await readJsonTranscript(`audios/message_${i}.json`);
+    message.lipsync = await readJsonTranscript(
+      `audios/_${req.params.id}_${i}.json`,
+    );
 
     // message.lipsync = undefined;
     console.log(`GenMetaData ${i}: ${new Date().getTime() - stime}ms`);
