@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {exec} from 'child_process';
+import { exec } from 'child_process';
 import wiki from 'wikipedia';
 import fs from 'fs/promises';
 
@@ -26,7 +26,7 @@ export async function streamToBase64(stream: ReadableStream) {
 
   let done, value;
 
-  while ((({done, value} = await reader.read()), !done)) {
+  while ((({ done, value } = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -166,7 +166,7 @@ export async function lipSyncMessage(message: string, id: string) {
   // -r phonetic is faster but less accurate
 }
 
-const execCommand = (command: string) => {
+export const execCommand = (command: string) => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, _) => {
       if (error) reject(error);
@@ -205,7 +205,7 @@ export async function streamToArrayBufferView(
 
   try {
     while (true) {
-      const {done, value} = await reader.read();
+      const { done, value } = await reader.read();
       if (done) break;
       if (value) chunks.push(value); // Skip empty chunks if any
     }
