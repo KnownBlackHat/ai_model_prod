@@ -35,7 +35,7 @@ function App() {
             />
 
 
-            <Loader hidden />
+            <Loader />
             <Leva hidden />
             <UI meta_ui={meta_ui} />
             <Canvas shadows camera={{ position: [0, 0, 1], fov: 30 }}>

@@ -158,7 +158,7 @@ async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
 
 export async function lipSyncMessage(message: string, id: string) {
   await execCommand(
-    `ffmpeg -y -i audios/${id}_${message}.wav audios/_${id}_${message}.wav | tee log`,
+    `ffmpeg -y -i audios/${id}_${message}.wav audios/_${id}_${message}.wav`,
   );
   await execCommand(
     `./bin/rhubarb -f json -o audios/_${id}_${message}.json audios/_${id}_${message}.wav -r phonetic`,
