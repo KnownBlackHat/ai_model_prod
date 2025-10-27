@@ -7,7 +7,10 @@ import * as THREE from "three";
 import { useChat } from "../hooks/useChat";
 
 const facialExpressions = {
-    default: {},
+    default: {
+        "mouthDimpleRight": 1,
+        "jawOpen": 0.07
+    },
     smile: {
         browInnerUp: 0.17,
         eyeSquintLeft: 0.4,
@@ -293,30 +296,6 @@ export function Avatar(props) {
         <group {...props} dispose={null} ref={group}>
             <primitive object={nodes.Hips} />
             <skinnedMesh
-                name="Wolf3D_Body"
-                geometry={nodes.Wolf3D_Body.geometry}
-                material={materials.Wolf3D_Body}
-                skeleton={nodes.Wolf3D_Body.skeleton}
-            />
-            <skinnedMesh
-                name="Wolf3D_Outfit_Footwear"
-                geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
-                material={materials.Wolf3D_Outfit_Footwear}
-                skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
-            />
-            <skinnedMesh
-                name="Wolf3D_Outfit_Top"
-                geometry={nodes.Wolf3D_Outfit_Top.geometry}
-                material={materials.Wolf3D_Outfit_Top}
-                skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
-            />
-            <skinnedMesh
-                name="Wolf3D_Hair"
-                geometry={nodes.Wolf3D_Hair.geometry}
-                material={materials.Wolf3D_Hair}
-                skeleton={nodes.Wolf3D_Hair.skeleton}
-            />
-            <skinnedMesh
                 name="EyeLeft"
                 geometry={nodes.EyeLeft.geometry}
                 material={materials.Wolf3D_Eye}
@@ -347,6 +326,31 @@ export function Avatar(props) {
                 skeleton={nodes.Wolf3D_Teeth.skeleton}
                 morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
                 morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+            />
+            <skinnedMesh
+                geometry={nodes.Wolf3D_Hair.geometry}
+                material={materials.Wolf3D_Hair}
+                skeleton={nodes.Wolf3D_Hair.skeleton}
+            />
+            <skinnedMesh
+                geometry={nodes.Wolf3D_Body.geometry}
+                material={materials.Wolf3D_Body}
+                skeleton={nodes.Wolf3D_Body.skeleton}
+            />
+            <skinnedMesh
+                geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+                material={materials.Wolf3D_Outfit_Bottom}
+                skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+            />
+            <skinnedMesh
+                geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+                material={materials.Wolf3D_Outfit_Footwear}
+                skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+            />
+            <skinnedMesh
+                geometry={nodes.Wolf3D_Outfit_Top.geometry}
+                material={materials.Wolf3D_Outfit_Top}
+                skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
             />
         </group>
     );
