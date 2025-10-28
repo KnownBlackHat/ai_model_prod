@@ -23,7 +23,7 @@
       mode: 0755
 
   - name: Run Cleanup
-    shell: /tmp/scripts/cleanup.sh &> cleanup.log
+    shell: /tmp/scripts/cleanup.sh > cleanup.log
 
   - name: Copy compose file
     copy:
@@ -33,5 +33,5 @@
       mode: 0755
 
   - name: Run the application
-    shell: /tmp/scripts/install.sh &> run_application.log
+    shell: /tmp/scripts/install.sh > run_application.log
 
