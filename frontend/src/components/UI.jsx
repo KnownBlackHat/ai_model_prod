@@ -158,7 +158,7 @@ export const UI = ({ hidden, meta_ui }) => {
             setChatHistory(his => [
                 ...his,
                 {
-                    date: Date.now(),
+                    createdAt: Date.now(),
                     user: null,
                     assistant: JSON.stringify([message])
                 }
@@ -280,7 +280,7 @@ export const UI = ({ hidden, meta_ui }) => {
             setChatHistory(his => [
                 ...his,
                 {
-                    date: Date.now(),
+                    createdAt: Date.now(),
                     user: text,
                     assistant: null
                 }
@@ -331,7 +331,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
                             <div className="flex space-y-4 flex-col overflow-y-scroll">
                                 {chatIds.map((value) =>
-                                    <div className="bg-slate-700 text-white p-2 text-center rounded-md flex justify-between items-center">
+                                    <div key={value.id} className="bg-slate-700 text-white p-2 text-center rounded-md flex justify-between items-center">
                                         <Link to={`/chat/${value.id}`}> {value.gist}</Link>
                                         <MdDeleteOutline className="text-3xl bg-red-700 rounded-md" onClick={async () => await handleDeleteHistory(value.id)} />
                                     </div>
