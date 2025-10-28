@@ -65,9 +65,6 @@ export async function summarizer(query: string): Promise<string> {
     model: 'openai/gpt-oss-120b',
     stop: ['```'],
   });
-  console.log(
-    `INTERACTION TRIGGERED ${query} -> ${completion.choices[0].message.content}`,
-  );
 
   return completion.choices[0].message.content || '';
 }

@@ -21,13 +21,11 @@ export async function get_ids(username: string, resp: Response) {
   const ids_arr = [];
   for (const conv of user.conversations) {
     if (conv.count <= 3) {
-      const real_count =
-        (await prisma.messages.count({
-          where: {
-            conversationId: conv.id,
-          },
-        })) - 1;
-      console.log(real_count, conv.count);
+      const real_count = await prisma.messages.count({
+        where: {
+          conversationId: conv.id,
+        },
+      });
       if (conv.count !== real_count) {
         const msgs = await prisma.messages.findMany({
           where: {
@@ -44,12 +42,14 @@ export async function get_ids(username: string, resp: Response) {
         }
         const gist = await summarizer(msgs_line.join('. '));
         conv.gist = gist;
+        console.log(`UPDATING DB count: ${conv.count} ${real_count}`);
         await prisma.conversation.update({
           where: {
             id: conv.id,
           },
           data: {
             gist,
+            count: real_count,
           },
         });
       }
