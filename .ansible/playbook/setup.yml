@@ -1,0 +1,37 @@
+---
+- name: Setup
+  hosts: backend
+  become: yes
+
+  tasks:
+
+  - name: Installing packages
+    apt:
+      pkg:
+        - git
+        - docker.io
+        - docker-compose
+        - curl
+      state: latest
+      update_cache: yes
+
+  - name: Copy scripts
+    copy:
+      src: ../scripts
+      dest: /tmp
+      owner: knownblackhat
+      mode: 0755
+
+  - name: Run Cleanup
+    shell: /tmp/scripts/cleanup.sh &> cleanup.log
+
+  - name: Copy compose file
+    copy:
+      src: ../../../docker-compose.yaml
+      dest: /tmp
+      owner: knownblackhat
+      mode: 0755
+
+  - name: Run the application
+    shell: /tmp/scripts/install.sh &> run_application.log
+
