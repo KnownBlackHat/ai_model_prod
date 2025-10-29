@@ -11,11 +11,19 @@ import { Link, useNavigate } from "react-router";
 import { MdDeleteOutline } from "react-icons/md";
 import { ErrorBoundary } from "react-error-boundary";
 
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
 
 const WAKE_WORD = ["niva", " va ", "liva", "nibha", "nivba", "eva ",];
 // const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 export const UI = ({ hidden, meta_ui }) => {
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
     const input = useRef();
     const [audioState, setaudioState] = useState("idle");
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,6 +37,19 @@ export const UI = ({ hidden, meta_ui }) => {
     const [speechCaption, setSpeechCaption] = useState("");
     const chatEndRef = useRef(null);
     const navigate = useNavigate();
+    let timeout;
+
+    useEffect(() => {
+        timeout = setTimeout(() => {
+            if (WAKE_WORD.some((word) => transcript.toLowerCase().includes(word))) {
+                SpeechRecognition.stop()
+                meta_ui.setAnimation("Idle");
+                sendAudio(text);
+                resetTranscript()
+            }
+            return () => { clearTimeout(timeout) }
+        }, 3000)
+    }, [transcript])
 
     function ErrorFallBack({ error }) {
         window.location.reload()
@@ -427,7 +448,7 @@ export const UI = ({ hidden, meta_ui }) => {
                         <div className="flex items-center justify-center">
                             <span className="text-white p-2 px-4 rounded-full text-center m-2 bg-black/70 text-xl mb-8 shadow-lg" id="caption">
 
-                                {speechCaption}
+                                {transcript}
 
                             </span>
                         </div>
@@ -445,19 +466,26 @@ export const UI = ({ hidden, meta_ui }) => {
 
                             <div>
                                 <div className="flex space-x-3">
-                                    {(true || window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
+                                    {browserSupportsSpeechRecognition && (
                                         <>
                                             {audioState === "idle" ? (
                                                 <button
                                                     className="text-2xl bg-black/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-black/90"
-                                                    onClick={speechRecon}
+                                                    onClick={() => {
+                                                        setaudioState("listen")
+                                                        SpeechRecognition.startListening({ continuous: true });
+
+                                                    }}
                                                 >
                                                     <FaMicrophoneAlt />
                                                 </button>
                                             ) : (
                                                 <button
                                                     className="text-2xl bg-red-500 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-600"
-                                                    onClick={MicStop}
+                                                    onClick={() => {
+                                                        SpeechRecognition.stopListening()
+                                                        setaudioState("idle")
+                                                    }}
                                                 >
                                                     <FaMicrophoneAltSlash />
                                                 </button>
