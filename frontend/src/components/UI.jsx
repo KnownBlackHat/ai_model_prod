@@ -231,7 +231,6 @@ export const UI = ({ hidden, meta_ui }) => {
 
 
             window.rec.onresult = (e) => {
-                console.log('res: ', e)
                 speech = Array.from(e.results).map((result) => result[0].transcript).join("");
                 for (const i in WAKE_WORD) {
                     speech.replace(i, 'Niva')
@@ -242,10 +241,8 @@ export const UI = ({ hidden, meta_ui }) => {
 
             window.rec.start();
             setaudioState("listen");
-            window.rec.addEventListener("start", () => console.log("rec started"))
 
             window.rec.addEventListener("end", (e) => {
-                console.log("end: ", e)
                 if (WAKE_WORD.some((word) => speech.toLowerCase().includes(word))) {
                     speechReconCleanup(speech);
                     speech = "";
@@ -445,7 +442,7 @@ export const UI = ({ hidden, meta_ui }) => {
 
                             <div>
                                 <div className="flex space-x-3">
-                                    {(true || window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
+                                    {(window?.webkitSpeechRecognition || window?.SpeechRecognition) && (
                                         <>
                                             {audioState === "idle" ? (
                                                 <button
