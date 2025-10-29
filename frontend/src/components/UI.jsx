@@ -233,7 +233,7 @@ export const UI = ({ hidden, meta_ui }) => {
             window.rec.onresult = (e) => {
                 console.log('res: ', e)
                 speech = Array.from(e.results).map((result) => result[0].transcript).join("");
-                for (i in WAKE_WORD) {
+                for (const i in WAKE_WORD) {
                     speech.replace(i, 'Niva')
                 }
                 setSpeechCaption(speech);
