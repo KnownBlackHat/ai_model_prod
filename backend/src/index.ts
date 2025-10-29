@@ -24,6 +24,7 @@ import {login, signup} from './controller/user';
 import {create_ids, delete_ids, get_ids} from './controller/conversation';
 import {get_messages} from './controller/message';
 import {prisma} from './constants';
+import compression from 'compression';
 
 const voiceIDele = process.env.ELEVEN_LABS_VOICEID ?? 'qBDvhofpxp92JgXJxDjB';
 
@@ -48,6 +49,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(compression());
 app.use((req, res, next) => {
   console.log('req: ', req.path, 'resp: ', res.statusCode);
   next();
