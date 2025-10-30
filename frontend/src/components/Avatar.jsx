@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from "react";
 
 import * as THREE from "three";
 import { useChat } from "../hooks/useChat";
+import { lipsyncManager } from "../App";
+import { VISEMES } from "wawa-lipsync";
 
 const facialExpressions = {
     default: {
@@ -78,17 +80,6 @@ const facialExpressions = {
     },
 };
 
-const corresponding = {
-    A: "viseme_PP",
-    B: "viseme_kk",
-    C: "viseme_I",
-    D: "viseme_AA",
-    E: "viseme_O",
-    F: "viseme_U",
-    G: "viseme_FF",
-    H: "viseme_TH",
-    X: "viseme_PP",
-};
 
 let setupMode = false;
 
@@ -96,10 +87,21 @@ export function Avatar(props) {
     const { nodes, materials, scene } = useGLTF(
         "/models/avatar.glb"
     );
+    const { smoothMovements } = useControls("Avatar", {
+        smoothMovements: {
+            value: true,
+            label: "Smooth Movements",
+        },
+    });
+
 
     const { message, onMessagePlayed, chat } = useChat();
 
-    const [lipsync, setLipsync] = useState();
+
+    const analyzeAudio = () => {
+        requestAnimationFrame(analyzeAudio);
+        lipsyncManager.processAudio();
+    };
 
     useEffect(() => {
         if (!message) {
@@ -109,9 +111,10 @@ export function Avatar(props) {
         }
         props.meta_ui.setAnimation(message.animation);
         props.meta_ui.setFacialExpression(message.facialExpression);
-        setLipsync(message.lipsync);
         const audio = new Audio("data:audio/mp3;base64," + message.audio);
+        lipsyncManager.connectAudio(audio)
         audio.play();
+        analyzeAudio()
         setAudio(audio);
         audio.onended = () => {
             props.meta_ui.setAnimation("Idle");
@@ -187,30 +190,25 @@ export function Avatar(props) {
             return;
         }
 
-        const appliedMorphTargets = [];
-        if (message && lipsync) {
-            const currentAudioTime = audio.currentTime;
-            for (let i = 0; i < lipsync.mouthCues.length; i++) {
-                const mouthCue = lipsync.mouthCues[i];
-                if (
-                    currentAudioTime >= mouthCue.start &&
-                    currentAudioTime <= mouthCue.end
-                ) {
-                    appliedMorphTargets.push(corresponding[mouthCue.value]);
-                    lerpMorphTarget(corresponding[mouthCue.value], 1, 0.2);
-                    break;
-                }
-            }
-        }
+        const viseme = lipsyncManager.viseme;
+        const state = lipsyncManager.state;
+        lerpMorphTarget(
+            viseme,
+            1,
+            smoothMovements ? (state === "vowel" ? 0.2 : 0.4) : 1
+        );
 
-        Object.values(corresponding).forEach((value) => {
-            if (appliedMorphTargets.includes(value)) {
+        Object.values(VISEMES).forEach((value) => {
+            if (viseme === value) {
                 return;
             }
-            lerpMorphTarget(value, 0, 0.1);
+            lerpMorphTarget(
+                value,
+                0,
+                smoothMovements ? (state === "vowel" ? 0.1 : 0.2) : 1
+            );
         });
     });
-
     useControls("FacialExpressions", {
         chat: button(() => chat()),
         winkLeft: button(() => {

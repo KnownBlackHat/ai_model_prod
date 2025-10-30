@@ -10,13 +10,7 @@ import express, {
   RequestHandler,
 } from 'express';
 
-import {
-  execCommand,
-  lipSyncMessage,
-  readJsonTranscript,
-  streamToArrayBufferView,
-  streamToBase64,
-} from './helper';
+import {streamToArrayBufferView} from './helper';
 import {groq} from './llm_interface';
 import jwt from 'jsonwebtoken';
 import {expend_credit, get_credit} from './controller/credits';
@@ -169,10 +163,8 @@ app.post('/chat/:id', async (req, res) => {
 
   const userMessage = req.body.message;
 
-  let stime = new Date().getTime();
   const messages: AiResponse[] = await groq(userMessage, req.params.id);
   async function genmetadata(i: number) {
-    const stime = new Date().getTime();
     const message = messages[i];
 
     const audio = await elevenlab.textToSpeech.convert(voiceIDele, {
@@ -188,24 +180,10 @@ app.post('/chat/:id', async (req, res) => {
     } catch (e) {
       console.log('error file write: ', e);
     }
-    // const arrayBuffer = await blob.arrayBuffer();
-    // const base64String = arrayBufferToBase64(arrayBuffer);
-
-    await lipSyncMessage(i.toString(), req.params.id);
-
     message.audio = Buffer.from(audioBuffer).toString('base64');
-    message.lipsync = await readJsonTranscript(
-      `audios/_${req.params.id}_${i}.json`,
-    );
-
-    // message.lipsync = undefined;
-    console.log(`GenMetaData ${i}: ${new Date().getTime() - stime}ms`);
-    await execCommand(`rm -rf audios/_${req.params.id}_* `);
-    await execCommand(`rm -rf audios/${req.params.id}_* `);
   }
 
   const task = [];
-  stime = new Date().getTime();
   for (let i = 0; i < messages.length; i++) {
     task.push(genmetadata(i));
   }

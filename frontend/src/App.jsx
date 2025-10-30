@@ -8,6 +8,9 @@ import React, { useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useParams } from 'react-router';
 import { useChat } from './hooks/useChat';
+import { Lipsync } from "wawa-lipsync";
+
+export const lipsyncManager = new Lipsync();
 
 function App() {
     const { chatId, setChatId } = useChat(0);
