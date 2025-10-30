@@ -12,6 +12,15 @@ import Login from "./pages/Login";
 import CreateAcc from "./pages/CreateAcc";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+import * as Sentry from "@sentry/react";
+
+Sentry.init({
+    dsn: "https://43b3b739106ea12abc96050652a6b7d6@o4510279589625856.ingest.us.sentry.io/4510279591067648",
+    integrations: [Sentry.browserTracingIntegration()],
+    tracePropagationTargets: ["localhost", /^https:\/\/niva.cybergenixsecurity\/.com/]
+});
+
+
 let router = createHashRouter([
     {
         path: "/chat",
