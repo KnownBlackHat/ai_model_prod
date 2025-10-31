@@ -1,19 +1,16 @@
 import axios from 'axios';
-import { exec } from 'child_process';
+import {exec} from 'child_process';
 import wiki from 'wikipedia';
 import fs from 'fs/promises';
 
 export function checkKeys(response: AiResponse[]) {
   const fields = ['text', 'facialExpression', 'animation'];
   for (let i = 0; i < response.length; i++) {
-    console.log(`checking ${i} response`);
     const params = response[i];
     fields.forEach(field => {
       if (!Object.keys(params).includes(field)) {
-        console.log(`${field} key not found`);
         throw new Error(`${field} key not found`);
       } else {
-        console.log(`${field} key found`);
       }
     });
   }
@@ -26,7 +23,7 @@ export async function streamToBase64(stream: ReadableStream) {
 
   let done, value;
 
-  while ((({ done, value } = await reader.read()), !done)) {
+  while ((({done, value} = await reader.read()), !done)) {
     chunks.push(value);
   }
 
@@ -81,7 +78,6 @@ export async function report_discord(
     // eslint-disable-next-line prettier/prettier
     body: JSON.stringify({ embeds: [embed] }),
   });
-  console.log('report_discord: ', resp.body);
 }
 
 export async function parse(file_path: string) {
@@ -117,14 +113,12 @@ export async function wikipedia(query: string): Promise<AiResponse[]> {
 }
 
 async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
-  console.log(`user: ${request.prompt}`);
   try {
     const response = await axios.post(
       `${process.env.OLLAMA_SERVER}/api/generate`,
       request,
     );
     const resp = response.data.response;
-    console.log(`Ollama: ${resp}`);
 
     try {
       const response: AiResponse[] = JSON.parse(resp);
@@ -205,7 +199,7 @@ export async function streamToArrayBufferView(
 
   try {
     while (true) {
-      const { done, value } = await reader.read();
+      const {done, value} = await reader.read();
       if (done) break;
       if (value) chunks.push(value); // Skip empty chunks if any
     }

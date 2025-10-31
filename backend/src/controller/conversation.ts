@@ -42,7 +42,6 @@ export async function get_ids(username: string, resp: Response) {
         }
         const gist = await summarizer(msgs_line.join('. '));
         conv.gist = gist;
-        console.log(`UPDATING DB count: ${conv.count} ${real_count}`);
         await prisma.conversation.update({
           where: {
             id: conv.id,
