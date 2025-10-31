@@ -232,9 +232,6 @@ export const UI = ({ hidden, meta_ui }) => {
 
             window.rec.onresult = (e) => {
                 speech = Array.from(e.results).map((result) => result[0].transcript).join("");
-                for (const i in WAKE_WORD) {
-                    speech.replace(i, 'Niva')
-                }
                 setSpeechCaption(speech);
                 meta_ui.setAnimation("Listening_1");
             };
@@ -243,7 +240,7 @@ export const UI = ({ hidden, meta_ui }) => {
             setaudioState("listen");
 
             window.rec.addEventListener("end", (e) => {
-                if (WAKE_WORD.some((word) => speech.toLowerCase().includes(word))) {
+                if (word) {
                     speechReconCleanup(speech);
                     speech = "";
                     setSpeechCaption("");
