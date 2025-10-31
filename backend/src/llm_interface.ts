@@ -10,14 +10,12 @@ const groq_agent = new Groq({
 });
 
 async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
-  console.log(`user: ${request.prompt}`);
   try {
     const response = await axios.post(
       `${process.env.OLLAMA_SERVER}/api/generate`,
       request,
     );
     const resp = response.data.response;
-    console.log(`Ollama: ${resp}`);
 
     try {
       const response: AiResponse[] = JSON.parse(resp);
@@ -74,7 +72,6 @@ export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
   }
   const history = await get_his_messages(id);
   const obj = groq_history_builder(history as unknown as Dblist[]);
-  console.log('obj: ', obj);
   const completion = await groq_agent.chat.completions.create({
     messages: [
       {
@@ -149,12 +146,10 @@ export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
   try {
     const response: AiResponse[] = JSON.parse(raw_response);
     checkKeys(response);
-    console.log('groq: ', response);
     await report_discord(query, JSON.stringify(response), false);
     await add_message(id, query, JSON.stringify(response));
     return response;
   } catch (e) {
-    console.log('error:', e);
     await report_discord(
       query,
       `
@@ -179,8 +174,6 @@ async function gemini_chat(query: string): Promise<AiResponse[]> {
     throw new Error('Gemini api key not defined');
   }
 
-  console.log(`user: ${query}`);
-
   let resp: AiResponse[];
 
   try {
@@ -201,12 +194,10 @@ async function gemini_chat(query: string): Promise<AiResponse[]> {
       history: jsonctx,
     });
     const result = await chat.sendMessage(query);
-    console.log(`gemini: ${result.response.text()} `);
     resp = JSON.parse(result.response.text());
   } catch (e) {
     console.error('gemini_chat func: ', e);
     resp = await wikipedia(query);
-    console.log(`wiki: ${JSON.stringify(resp)} `);
   }
   return resp;
 }

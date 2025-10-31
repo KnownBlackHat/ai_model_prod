@@ -2,6 +2,8 @@ import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import fs from 'fs/promises';
+import './instrument';
+import Sentry from '@sentry/node';
 
 import express, {
   Request,
@@ -41,13 +43,6 @@ async function run() {
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-app.use(cors());
-app.use(compression());
-app.use((req, res, next) => {
-  console.log('req: ', req.path, 'resp: ', res.statusCode);
-  next();
-});
 const secret = process.env.JWT_SECRET || '';
 const port = 3000;
 
@@ -65,7 +60,11 @@ function asyncHandler<R extends Request = Request>(
 
 const authenticate = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (req.originalUrl === '/signup' || req.originalUrl === '/login') {
+    if (
+      req.originalUrl === '/signup' ||
+      req.originalUrl === '/login' ||
+      req.originalUrl === '/debug-sentry'
+    ) {
       next();
     } else {
       const authHeader = req.headers['authorization'];
@@ -197,6 +196,19 @@ app.get('/credits', async (req, res) => {
   const token = authHeader && authHeader.split(' ')[1];
   const decoded = jwt.verify(token || '', secret || '') as {email: string};
   await get_credit(decoded.email, res);
+});
+
+app.get('/debug-sentry', (req, res) => {
+  throw new Error('My first Sentry error!');
+});
+
+Sentry.setupExpressErrorHandler(app);
+app.use(express.json());
+app.use(cors());
+app.use(compression());
+app.use((req, res, next) => {
+  console.log('req: ', req.path, 'resp: ', res.statusCode);
+  next();
 });
 
 app.listen(port, async () => {
