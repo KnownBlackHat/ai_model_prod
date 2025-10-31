@@ -198,10 +198,6 @@ app.get('/credits', async (req, res) => {
   await get_credit(decoded.email, res);
 });
 
-app.get('/debug-sentry', (req, res) => {
-  throw new Error('My first Sentry error!');
-});
-
 Sentry.setupExpressErrorHandler(app);
 app.use(express.json());
 app.use(cors());
