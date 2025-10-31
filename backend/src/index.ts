@@ -45,6 +45,7 @@ async function run() {
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 const secret = process.env.JWT_SECRET || '';
 const port = 3000;
 
@@ -62,11 +63,7 @@ function asyncHandler<R extends Request = Request>(
 
 const authenticate = asyncHandler<AuthRequest>(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (
-      req.originalUrl === '/signup' ||
-      req.originalUrl === '/login' ||
-      req.originalUrl === '/debug-sentry'
-    ) {
+    if (req.originalUrl === '/signup' || req.originalUrl === '/login') {
       next();
     } else {
       const authHeader = req.headers['authorization'];
@@ -201,7 +198,6 @@ app.get('/credits', async (req, res) => {
 });
 
 Sentry.setupExpressErrorHandler(app);
-app.use(express.json());
 app.use(cors());
 app.use(compression());
 app.use((req, res, next) => {

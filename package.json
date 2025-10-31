@@ -10,7 +10,6 @@
   "lint-staged": {
     "backend/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "sh -c 'cd backend && bun run prettier . --write'",
-      "sh -c 'cd backend && bun run clean'",
       "sh -c 'cd backend && bun run lint'"
     ],
     "frontend/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [

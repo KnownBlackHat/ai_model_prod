@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {exec} from 'child_process';
 import wiki from 'wikipedia';
 // eslint-disable-next-line n/no-unsupported-features/node-builtins

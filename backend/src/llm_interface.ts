@@ -1,7 +1,5 @@
-import axios from 'axios';
 import {ChatCompletionMessageParam} from 'groq-sdk/resources/chat/completions';
-import {GoogleGenerativeAI} from '@google/generative-ai';
-import {parse, checkKeys, report_discord, wikipedia} from './helper';
+import {checkKeys, report_discord} from './helper';
 import Groq from 'groq-sdk';
 import {add_message, get_his_messages} from './controller/message';
 
