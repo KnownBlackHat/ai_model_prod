@@ -9,43 +9,43 @@ const groq_agent = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
-  try {
-    const response = await axios.post(
-      `${process.env.OLLAMA_SERVER}/api/generate`,
-      request,
-    );
-    const resp = response.data.response;
+// async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
+//   try {
+//     const response = await axios.post(
+//       `${process.env.OLLAMA_SERVER}/api/generate`,
+//       request,
+//     );
+//     const resp = response.data.response;
 
-    try {
-      const response: AiResponse[] = JSON.parse(resp);
-      checkKeys(response);
+//     try {
+//       const response: AiResponse[] = JSON.parse(resp);
+//       checkKeys(response);
 
-      // const {text, facialExpression, animation, audio, lipsync} = response;
-      // const toCheck = [text, facialExpression, animation, audio, lipsync];
-      // for (let i = 0; i < toCheck.length; i++) {
-      //   if (isNaN(toCheck[i])) throw Error();
-      // }
+//       // const {text, facialExpression, animation, audio, lipsync} = response;
+//       // const toCheck = [text, facialExpression, animation, audio, lipsync];
+//       // for (let i = 0; i < toCheck.length; i++) {
+//       //   if (isNaN(toCheck[i])) throw Error();
+//       // }
 
-      return response;
-    } catch {
-      return [
-        {
-          text: 'Sorry i was not able to hear you, could you please repeat your query!',
-          facialExpression: 'sad',
-          animation: 'Crying',
-        },
-      ];
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(`Error: ${error.message}`);
-    } else {
-      console.error(`Unexpected error: ${error}`);
-    }
-    throw error;
-  }
-}
+//       return response;
+//     } catch {
+//       return [
+//         {
+//           text: 'Sorry i was not able to hear you, could you please repeat your query!',
+//           facialExpression: 'sad',
+//           animation: 'Crying',
+//         },
+//       ];
+//     }
+//   } catch (error) {
+//     if (axios.isAxiosError(error)) {
+//       console.error(`Error: ${error.message}`);
+//     } else {
+//       console.error(`Unexpected error: ${error}`);
+//     }
+//     throw error;
+//   }
+// }
 
 function groq_history_builder(dblist: Dblist[]): ChatCompletionMessageParam[] {
   const response: ChatCompletionMessageParam[] = [];
@@ -169,35 +169,35 @@ export async function groq(query: string, id = '1'): Promise<AiResponse[]> {
   }
 }
 
-async function gemini_chat(query: string): Promise<AiResponse[]> {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('Gemini api key not defined');
-  }
+// async function gemini_chat(query: string): Promise<AiResponse[]> {
+//   if (!process.env.GEMINI_API_KEY) {
+//     throw new Error('Gemini api key not defined');
+//   }
 
-  let resp: AiResponse[];
+//   let resp: AiResponse[];
 
-  try {
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro-002',
-      systemInstruction: `
-      You are a chat bot of galgotias university who provides details about an event taking place in our college.
-        take recent info from context given.don't include * in text or any emoji, and be formal
-        You will always reply with a JSON array of messages.With a maximum of 2 messages.and don't quote it with \`\`\`json and message should be concise
-        Each message has a text, facialExpression, and animation property.
-        The different facial expressions are: smile, sad, angry, surprised, funnyFace, and default.
-        The different animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
-        `,
-    });
-    const jsonctx = await parse('../context.json');
-    const chat = model.startChat({
-      history: jsonctx,
-    });
-    const result = await chat.sendMessage(query);
-    resp = JSON.parse(result.response.text());
-  } catch (e) {
-    console.error('gemini_chat func: ', e);
-    resp = await wikipedia(query);
-  }
-  return resp;
-}
+//   try {
+//     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+//     const model = genAI.getGenerativeModel({
+//       model: 'gemini-1.5-pro-002',
+//       systemInstruction: `
+//       You are a chat bot of galgotias university who provides details about an event taking place in our college.
+//         take recent info from context given.don't include * in text or any emoji, and be formal
+//         You will always reply with a JSON array of messages.With a maximum of 2 messages.and don't quote it with \`\`\`json and message should be concise
+//         Each message has a text, facialExpression, and animation property.
+//         The different facial expressions are: smile, sad, angry, surprised, funnyFace, and default.
+//         The different animations are: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified, and Angry.
+//         `,
+//     });
+//     const jsonctx = await parse('../context.json');
+//     const chat = model.startChat({
+//       history: jsonctx,
+//     });
+//     const result = await chat.sendMessage(query);
+//     resp = JSON.parse(result.response.text());
+//   } catch (e) {
+//     console.error('gemini_chat func: ', e);
+//     resp = await wikipedia(query);
+//   }
+//   return resp;
+// }

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {exec} from 'child_process';
 import wiki from 'wikipedia';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
 import fs from 'fs/promises';
 
 export function checkKeys(response: AiResponse[]) {
@@ -10,7 +11,6 @@ export function checkKeys(response: AiResponse[]) {
     fields.forEach(field => {
       if (!Object.keys(params).includes(field)) {
         throw new Error(`${field} key not found`);
-      } else {
       }
     });
   }
@@ -70,13 +70,13 @@ export async function report_discord(
 
   const webhookUrl =
     'https://discord.com/api/webhooks/1408294833340026920/7a1PkyNfMBbGnFtLl_7TurhU93S5ukN3MluAjjJIpaNnX_Yn-K8FBmYT7Tq3UriC84KD';
-  const resp = await fetch(webhookUrl, {
+  await fetch(webhookUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     // eslint-disable-next-line prettier/prettier
-    body: JSON.stringify({ embeds: [embed] }),
+    body: JSON.stringify({embeds: [embed]}),
   });
 }
 
@@ -112,43 +112,43 @@ export async function wikipedia(query: string): Promise<AiResponse[]> {
   return resp;
 }
 
-async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
-  try {
-    const response = await axios.post(
-      `${process.env.OLLAMA_SERVER}/api/generate`,
-      request,
-    );
-    const resp = response.data.response;
+// async function ollama(request: GenerateRequest): Promise<AiResponse[]> {
+//   try {
+//     const response = await axios.post(
+//       `${process.env.OLLAMA_SERVER}/api/generate`,
+//       request,
+//     );
+//     const resp = response.data.response;
 
-    try {
-      const response: AiResponse[] = JSON.parse(resp);
-      checkKeys(response);
+//     try {
+//       const response: AiResponse[] = JSON.parse(resp);
+//       checkKeys(response);
 
-      // const {text, facialExpression, animation, audio, lipsync} = response;
-      // const toCheck = [text, facialExpression, animation, audio, lipsync];
-      // for (let i = 0; i < toCheck.length; i++) {
-      //   if (isNaN(toCheck[i])) throw Error();
-      // }
+//       // const {text, facialExpression, animation, audio, lipsync} = response;
+//       // const toCheck = [text, facialExpression, animation, audio, lipsync];
+//       // for (let i = 0; i < toCheck.length; i++) {
+//       //   if (isNaN(toCheck[i])) throw Error();
+//       // }
 
-      return response;
-    } catch {
-      return [
-        {
-          text: 'Sorry i was not able to hear you, could you please repeat your query!',
-          facialExpression: 'sad',
-          animation: 'Crying',
-        },
-      ];
-    }
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.error(`Error: ${error.message}`);
-    } else {
-      console.error(`Unexpected error: ${error}`);
-    }
-    throw error;
-  }
-}
+//       return response;
+//     } catch {
+//       return [
+//         {
+//           text: 'Sorry i was not able to hear you, could you please repeat your query!',
+//           facialExpression: 'sad',
+//           animation: 'Crying',
+//         },
+//       ];
+//     }
+//   } catch (error) {
+//     if (axios.isAxiosError(error)) {
+//       console.error(`Error: ${error.message}`);
+//     } else {
+//       console.error(`Unexpected error: ${error}`);
+//     }
+//     throw error;
+//   }
+// }
 
 export async function lipSyncMessage(message: string, id: string) {
   await execCommand(
@@ -162,7 +162,7 @@ export async function lipSyncMessage(message: string, id: string) {
 
 export const execCommand = (command: string) => {
   return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, _) => {
+    exec(command, (error, stdout) => {
       if (error) reject(error);
       resolve(stdout);
     });
@@ -198,6 +198,7 @@ export async function streamToArrayBufferView(
   const chunks: Uint8Array[] = [];
 
   try {
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const {done, value} = await reader.read();
       if (done) break;

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import cors from 'cors';
 import dotenv from 'dotenv';
+// eslint-disable-next-line n/no-unsupported-features/node-builtins
 import fs from 'fs/promises';
 import './instrument';
 import Sentry from '@sentry/node';
