@@ -9,349 +9,345 @@ import { lipsyncManager } from "../App";
 import { VISEMES } from "wawa-lipsync";
 
 const facialExpressions = {
-    default: {
-        "mouthDimpleRight": 1,
-        "jawOpen": 0.07
-    },
-    smile: {
-        browInnerUp: 0.17,
-        eyeSquintLeft: 0.4,
-        eyeSquintRight: 0.44,
-        noseSneerLeft: 0.1700000727403593,
-        noseSneerRight: 0.14000002836874015,
-        mouthPressLeft: 0.61,
-        mouthPressRight: 0.41000000000000003,
-    },
-    funnyFace: {
-        jawLeft: 0.63,
-        mouthPucker: 0.53,
-        noseSneerLeft: 1,
-        noseSneerRight: 0.39,
-        mouthLeft: 1,
-        eyeLookUpLeft: 1,
-        eyeLookUpRight: 1,
-        cheekPuff: 0.9999924982764238,
-        mouthDimpleLeft: 0.414743888682652,
-        mouthRollLower: 0.32,
-        mouthSmileLeft: 0.35499733688813034,
-        mouthSmileRight: 0.35499733688813034,
-    },
-    sad: {
-        mouthFrownLeft: 1,
-        mouthFrownRight: 1,
-        mouthShrugLower: 0.78341,
-        browInnerUp: 0.452,
-        eyeSquintLeft: 0.72,
-        eyeSquintRight: 0.75,
-        eyeLookDownLeft: 0.5,
-        eyeLookDownRight: 0.5,
-        jawForward: 1,
-    },
-    surprised: {
-        eyeWideLeft: 0.5,
-        eyeWideRight: 0.5,
-        jawOpen: 0.17,
-        mouthFunnel: 0.19,
-        browInnerUp: 0.65,
-    },
-    angry: {
-        browDownLeft: 1,
-        browDownRight: 1,
-        eyeSquintLeft: 1,
-        eyeSquintRight: 1,
-        jawForward: 1,
-        jawLeft: 1,
-        mouthShrugLower: 1,
-        noseSneerLeft: 1,
-        noseSneerRight: 0.42,
-        eyeLookDownLeft: 0.16,
-        eyeLookDownRight: 0.16,
-        cheekSquintLeft: 1,
-        cheekSquintRight: 1,
-        mouthClose: 0.23,
-        mouthFunnel: 0.63,
-        mouthDimpleRight: 1,
-    },
-    crazy: {
-        mouthStretchLeft: 1,
-        mouthStretchRight: 1,
-        mouthSmileLeft: 0.53,
-        mouthSmileRight: 0.47,
-    },
+  default: {
+    mouthDimpleRight: 1,
+    jawOpen: 0.07,
+  },
+  smile: {
+    browInnerUp: 0.17,
+    eyeSquintLeft: 0.4,
+    eyeSquintRight: 0.44,
+    noseSneerLeft: 0.1700000727403593,
+    noseSneerRight: 0.14000002836874015,
+    mouthPressLeft: 0.61,
+    mouthPressRight: 0.41000000000000003,
+  },
+  funnyFace: {
+    jawLeft: 0.63,
+    mouthPucker: 0.53,
+    noseSneerLeft: 1,
+    noseSneerRight: 0.39,
+    mouthLeft: 1,
+    eyeLookUpLeft: 1,
+    eyeLookUpRight: 1,
+    cheekPuff: 0.9999924982764238,
+    mouthDimpleLeft: 0.414743888682652,
+    mouthRollLower: 0.32,
+    mouthSmileLeft: 0.35499733688813034,
+    mouthSmileRight: 0.35499733688813034,
+  },
+  sad: {
+    mouthFrownLeft: 1,
+    mouthFrownRight: 1,
+    mouthShrugLower: 0.78341,
+    browInnerUp: 0.452,
+    eyeSquintLeft: 0.72,
+    eyeSquintRight: 0.75,
+    eyeLookDownLeft: 0.5,
+    eyeLookDownRight: 0.5,
+    jawForward: 1,
+  },
+  surprised: {
+    eyeWideLeft: 0.5,
+    eyeWideRight: 0.5,
+    jawOpen: 0.17,
+    mouthFunnel: 0.19,
+    browInnerUp: 0.65,
+  },
+  angry: {
+    browDownLeft: 1,
+    browDownRight: 1,
+    eyeSquintLeft: 1,
+    eyeSquintRight: 1,
+    jawForward: 1,
+    jawLeft: 1,
+    mouthShrugLower: 1,
+    noseSneerLeft: 1,
+    noseSneerRight: 0.42,
+    eyeLookDownLeft: 0.16,
+    eyeLookDownRight: 0.16,
+    cheekSquintLeft: 1,
+    cheekSquintRight: 1,
+    mouthClose: 0.23,
+    mouthFunnel: 0.63,
+    mouthDimpleRight: 1,
+  },
+  crazy: {
+    mouthStretchLeft: 1,
+    mouthStretchRight: 1,
+    mouthSmileLeft: 0.53,
+    mouthSmileRight: 0.47,
+  },
 };
-
 
 let setupMode = false;
 
 export function Avatar(props) {
-    const { nodes, materials, scene } = useGLTF(
-        "/models/avatar.glb"
-    );
-    const { smoothMovements } = useControls("Avatar", {
-        smoothMovements: {
-            value: true,
-            label: "Smooth Movements",
-        },
-    });
+  const { nodes, materials, scene } = useGLTF("/models/avatar.glb");
+  const { smoothMovements } = useControls("Avatar", {
+    smoothMovements: {
+      value: true,
+      label: "Smooth Movements",
+    },
+  });
 
+  const { message, onMessagePlayed, chat } = useChat();
 
-    const { message, onMessagePlayed, chat } = useChat();
+  const analyzeAudio = () => {
+    requestAnimationFrame(analyzeAudio);
+    lipsyncManager.processAudio();
+  };
 
-
-    const analyzeAudio = () => {
-        requestAnimationFrame(analyzeAudio);
-        lipsyncManager.processAudio();
+  useEffect(() => {
+    if (!message) {
+      props.meta_ui.setAnimation("Idle");
+      window.rec?.start();
+      return;
+    }
+    props.meta_ui.setAnimation(message.animation);
+    props.meta_ui.setFacialExpression(message.facialExpression);
+    const audio = new Audio("data:audio/mp3;base64," + message.audio);
+    lipsyncManager.connectAudio(audio);
+    audio.play();
+    analyzeAudio();
+    setAudio(audio);
+    audio.onended = () => {
+      props.meta_ui.setAnimation("Idle");
+      props.meta_ui.setFacialExpression("default");
+      onMessagePlayed();
     };
+  }, [message]);
 
-    useEffect(() => {
-        if (!message) {
-            props.meta_ui.setAnimation("Idle");
-            window.rec?.start()
-            return;
+  const group = useRef();
+  const { actions, mixer } = useAnimations(props.meta_ui.animations, group);
+
+  useEffect(() => {
+    actions[props.meta_ui.animation]
+      ?.reset()
+      ?.fadeIn(mixer.stats.actions.inUse === 0 ? 0 : 0.5)
+      ?.play();
+    return () => actions[props.meta_ui.animation]?.fadeOut(0.5);
+  }, [props.meta_ui.animation]);
+
+  const lerpMorphTarget = (target, value, speed = 0.1) => {
+    scene.traverse((child) => {
+      if (child.isSkinnedMesh && child.morphTargetDictionary) {
+        const index = child.morphTargetDictionary[target];
+        if (
+          index === undefined ||
+          child.morphTargetInfluences[index] === undefined
+        ) {
+          return;
         }
-        props.meta_ui.setAnimation(message.animation);
-        props.meta_ui.setFacialExpression(message.facialExpression);
-        const audio = new Audio("data:audio/mp3;base64," + message.audio);
-        lipsyncManager.connectAudio(audio)
-        audio.play();
-        analyzeAudio()
-        setAudio(audio);
-        audio.onended = () => {
-            props.meta_ui.setAnimation("Idle");
-            props.meta_ui.setFacialExpression("default")
-            onMessagePlayed();
-        }
-
-    }, [message]);
-
-
-    const group = useRef();
-    const { actions, mixer } = useAnimations(props.meta_ui.animations, group);
-
-    useEffect(() => {
-        actions[props.meta_ui.animation]
-            ?.reset()
-            ?.fadeIn(mixer.stats.actions.inUse === 0 ? 0 : 0.5)
-            ?.play();
-        return () => actions[props.meta_ui.animation]?.fadeOut(0.5);
-    }, [props.meta_ui.animation]);
-
-    const lerpMorphTarget = (target, value, speed = 0.1) => {
-        scene.traverse((child) => {
-            if (child.isSkinnedMesh && child.morphTargetDictionary) {
-                const index = child.morphTargetDictionary[target];
-                if (
-                    index === undefined ||
-                    child.morphTargetInfluences[index] === undefined
-                ) {
-                    return;
-                }
-                child.morphTargetInfluences[index] = THREE.MathUtils.lerp(
-                    child.morphTargetInfluences[index],
-                    value,
-                    speed
-                );
-
-                if (!setupMode) {
-                    try {
-                        set({
-                            [target]: value,
-                        });
-                    } catch (e) { }
-                }
-            }
-        });
-    };
-
-    const [blink, setBlink] = useState(false);
-    const [winkLeft, setWinkLeft] = useState(false);
-    const [winkRight, setWinkRight] = useState(false);
-    const [audio, setAudio] = useState();
-
-    useFrame(() => {
-        !setupMode &&
-            Object.keys(nodes.EyeLeft.morphTargetDictionary).forEach((key) => {
-                const mapping = facialExpressions[props.meta_ui.facialExpression];
-                if (key === "eyeBlinkLeft" || key === "eyeBlinkRight") {
-                    return; // eyes wink/blink are handled separately
-                }
-                if (mapping && mapping[key]) {
-                    lerpMorphTarget(key, mapping[key], 0.1);
-                } else {
-                    lerpMorphTarget(key, 0, 0.1);
-                }
-            });
-
-        lerpMorphTarget("eyeBlinkLeft", blink || winkLeft ? 1 : 0, 0.5);
-        lerpMorphTarget("eyeBlinkRight", blink || winkRight ? 1 : 0, 0.5);
-
-        // LIPSYNC
-        if (setupMode) {
-            return;
-        }
-
-        const viseme = lipsyncManager.viseme;
-        const state = lipsyncManager.state;
-        lerpMorphTarget(
-            viseme,
-            1,
-            smoothMovements ? (state === "vowel" ? 0.2 : 0.4) : 1
+        child.morphTargetInfluences[index] = THREE.MathUtils.lerp(
+          child.morphTargetInfluences[index],
+          value,
+          speed,
         );
 
-        Object.values(VISEMES).forEach((value) => {
-            if (viseme === value) {
-                return;
-            }
-            lerpMorphTarget(
-                value,
-                0,
-                smoothMovements ? (state === "vowel" ? 0.1 : 0.2) : 1
-            );
-        });
-    });
-    useControls("FacialExpressions", {
-        chat: button(() => chat()),
-        winkLeft: button(() => {
-            setWinkLeft(true);
-            setTimeout(() => setWinkLeft(false), 300);
-        }),
-        winkRight: button(() => {
-            setWinkRight(true);
-            setTimeout(() => setWinkRight(false), 300);
-        }),
-        animation: {
-            value: props.meta_ui.animation,
-            options: props.meta_ui.animations.map((a) => a.name),
-            onChange: (value) => props.meta_ui.setAnimation(value),
-        },
-        facialExpression: {
-            options: Object.keys(facialExpressions),
-            onChange: (value) => props.meta_ui.setFacialExpression(value),
-        },
-        enableSetupMode: button(() => {
-            setupMode = true;
-        }),
-        disableSetupMode: button(() => {
-            setupMode = false;
-        }),
-        logMorphTargetValues: button(() => {
-            const emotionValues = {};
-            Object.keys(nodes.EyeLeft.morphTargetDictionary).forEach((key) => {
-                if (key === "eyeBlinkLeft" || key === "eyeBlinkRight") {
-                    return; // eyes wink/blink are handled separately
-                }
-                const value =
-                    nodes.EyeLeft.morphTargetInfluences[
-                    nodes.EyeLeft.morphTargetDictionary[key]
-                    ];
-                if (value > 0.01) {
-                    emotionValues[key] = value;
-                }
+        if (!setupMode) {
+          try {
+            set({
+              [target]: value,
             });
-            console.log(JSON.stringify(emotionValues, null, 2));
-        }),
+          } catch (e) {}
+        }
+      }
     });
+  };
 
-    const [, set] = useControls("MorphTarget", () =>
-        Object.assign(
-            {},
-            ...Object.keys(nodes.EyeLeft.morphTargetDictionary).map((key) => {
-                return {
-                    [key]: {
-                        label: key,
-                        value: 0,
-                        min: nodes.EyeLeft.morphTargetInfluences[
-                            nodes.EyeLeft.morphTargetDictionary[key]
-                        ],
-                        max: 1,
-                        onChange: (val) => {
-                            if (setupMode) {
-                                lerpMorphTarget(key, val, 1);
-                            }
-                        },
-                    },
-                };
-            })
-        )
+  const [blink, setBlink] = useState(false);
+  const [winkLeft, setWinkLeft] = useState(false);
+  const [winkRight, setWinkRight] = useState(false);
+  const [audio, setAudio] = useState();
+
+  useFrame(() => {
+    !setupMode &&
+      Object.keys(nodes.EyeLeft.morphTargetDictionary).forEach((key) => {
+        const mapping = facialExpressions[props.meta_ui.facialExpression];
+        if (key === "eyeBlinkLeft" || key === "eyeBlinkRight") {
+          return; // eyes wink/blink are handled separately
+        }
+        if (mapping && mapping[key]) {
+          lerpMorphTarget(key, mapping[key], 0.1);
+        } else {
+          lerpMorphTarget(key, 0, 0.1);
+        }
+      });
+
+    lerpMorphTarget("eyeBlinkLeft", blink || winkLeft ? 1 : 0, 0.5);
+    lerpMorphTarget("eyeBlinkRight", blink || winkRight ? 1 : 0, 0.5);
+
+    // LIPSYNC
+    if (setupMode) {
+      return;
+    }
+
+    const viseme = lipsyncManager.viseme;
+    const state = lipsyncManager.state;
+    lerpMorphTarget(
+      viseme,
+      1,
+      smoothMovements ? (state === "vowel" ? 0.2 : 0.4) : 1,
     );
 
-    useEffect(() => {
-        let blinkTimeout;
-        const nextBlink = () => {
-            blinkTimeout = setTimeout(() => {
-                setBlink(true);
-                setTimeout(() => {
-                    setBlink(false);
-                    nextBlink();
-                }, 200);
-            }, THREE.MathUtils.randInt(1000, 5000));
+    Object.values(VISEMES).forEach((value) => {
+      if (viseme === value) {
+        return;
+      }
+      lerpMorphTarget(
+        value,
+        0,
+        smoothMovements ? (state === "vowel" ? 0.1 : 0.2) : 1,
+      );
+    });
+  });
+  useControls("FacialExpressions", {
+    chat: button(() => chat()),
+    winkLeft: button(() => {
+      setWinkLeft(true);
+      setTimeout(() => setWinkLeft(false), 300);
+    }),
+    winkRight: button(() => {
+      setWinkRight(true);
+      setTimeout(() => setWinkRight(false), 300);
+    }),
+    animation: {
+      value: props.meta_ui.animation,
+      options: props.meta_ui.animations.map((a) => a.name),
+      onChange: (value) => props.meta_ui.setAnimation(value),
+    },
+    facialExpression: {
+      options: Object.keys(facialExpressions),
+      onChange: (value) => props.meta_ui.setFacialExpression(value),
+    },
+    enableSetupMode: button(() => {
+      setupMode = true;
+    }),
+    disableSetupMode: button(() => {
+      setupMode = false;
+    }),
+    logMorphTargetValues: button(() => {
+      const emotionValues = {};
+      Object.keys(nodes.EyeLeft.morphTargetDictionary).forEach((key) => {
+        if (key === "eyeBlinkLeft" || key === "eyeBlinkRight") {
+          return; // eyes wink/blink are handled separately
+        }
+        const value =
+          nodes.EyeLeft.morphTargetInfluences[
+            nodes.EyeLeft.morphTargetDictionary[key]
+          ];
+        if (value > 0.01) {
+          emotionValues[key] = value;
+        }
+      });
+      console.log(JSON.stringify(emotionValues, null, 2));
+    }),
+  });
+
+  const [, set] = useControls("MorphTarget", () =>
+    Object.assign(
+      {},
+      ...Object.keys(nodes.EyeLeft.morphTargetDictionary).map((key) => {
+        return {
+          [key]: {
+            label: key,
+            value: 0,
+            min: nodes.EyeLeft.morphTargetInfluences[
+              nodes.EyeLeft.morphTargetDictionary[key]
+            ],
+            max: 1,
+            onChange: (val) => {
+              if (setupMode) {
+                lerpMorphTarget(key, val, 1);
+              }
+            },
+          },
         };
-        nextBlink();
-        return () => clearTimeout(blinkTimeout);
-    }, []);
+      }),
+    ),
+  );
 
-    return (
-        <group {...props} dispose={null} ref={group}>
-            <primitive object={nodes.Hips} />
-            <skinnedMesh
-                name="EyeLeft"
-                geometry={nodes.EyeLeft.geometry}
-                material={materials.Wolf3D_Eye}
-                skeleton={nodes.EyeLeft.skeleton}
-                morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
-                morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
-            />
-            <skinnedMesh
-                name="EyeRight"
-                geometry={nodes.EyeRight.geometry}
-                material={materials.Wolf3D_Eye}
-                skeleton={nodes.EyeRight.skeleton}
-                morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
-                morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
-            />
-            <skinnedMesh
-                name="Wolf3D_Head"
-                geometry={nodes.Wolf3D_Head.geometry}
-                material={materials.Wolf3D_Skin}
-                skeleton={nodes.Wolf3D_Head.skeleton}
-                morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
-                morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
-            />
-            <skinnedMesh
-                name="Wolf3D_Teeth"
-                geometry={nodes.Wolf3D_Teeth.geometry}
-                material={materials.Wolf3D_Teeth}
-                skeleton={nodes.Wolf3D_Teeth.skeleton}
-                morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
-                morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
-            />
-            <skinnedMesh
-                geometry={nodes.Wolf3D_Hair.geometry}
-                material={materials.Wolf3D_Hair}
-                skeleton={nodes.Wolf3D_Hair.skeleton}
-            />
-            <skinnedMesh
-                geometry={nodes.Wolf3D_Body.geometry}
-                material={materials.Wolf3D_Body}
-                skeleton={nodes.Wolf3D_Body.skeleton}
-            />
-            <skinnedMesh
-                geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
-                material={materials.Wolf3D_Outfit_Bottom}
-                skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
-            />
-            <skinnedMesh
-                geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
-                material={materials.Wolf3D_Outfit_Footwear}
-                skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
-            />
-            <skinnedMesh
-                geometry={nodes.Wolf3D_Outfit_Top.geometry}
-                material={materials.Wolf3D_Outfit_Top}
-                skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
-            />
-        </group>
-    );
+  useEffect(() => {
+    let blinkTimeout;
+    const nextBlink = () => {
+      blinkTimeout = setTimeout(
+        () => {
+          setBlink(true);
+          setTimeout(() => {
+            setBlink(false);
+            nextBlink();
+          }, 200);
+        },
+        THREE.MathUtils.randInt(1000, 5000),
+      );
+    };
+    nextBlink();
+    return () => clearTimeout(blinkTimeout);
+  }, []);
+
+  return (
+    <group {...props} dispose={null} ref={group}>
+      <primitive object={nodes.Hips} />
+      <skinnedMesh
+        name="EyeLeft"
+        geometry={nodes.EyeLeft.geometry}
+        material={materials.Wolf3D_Eye}
+        skeleton={nodes.EyeLeft.skeleton}
+        morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
+        morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="EyeRight"
+        geometry={nodes.EyeRight.geometry}
+        material={materials.Wolf3D_Eye}
+        skeleton={nodes.EyeRight.skeleton}
+        morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
+        morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Head"
+        geometry={nodes.Wolf3D_Head.geometry}
+        material={materials.Wolf3D_Skin}
+        skeleton={nodes.Wolf3D_Head.skeleton}
+        morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
+        morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
+      />
+      <skinnedMesh
+        name="Wolf3D_Teeth"
+        geometry={nodes.Wolf3D_Teeth.geometry}
+        material={materials.Wolf3D_Teeth}
+        skeleton={nodes.Wolf3D_Teeth.skeleton}
+        morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
+        morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Hair.geometry}
+        material={materials.Wolf3D_Hair}
+        skeleton={nodes.Wolf3D_Hair.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Body.geometry}
+        material={materials.Wolf3D_Body}
+        skeleton={nodes.Wolf3D_Body.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+        material={materials.Wolf3D_Outfit_Bottom}
+        skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+        material={materials.Wolf3D_Outfit_Footwear}
+        skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+      />
+      <skinnedMesh
+        geometry={nodes.Wolf3D_Outfit_Top.geometry}
+        material={materials.Wolf3D_Outfit_Top}
+        skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
+      />
+    </group>
+  );
 }
 
 useGLTF.preload("/models/avatar.glb");

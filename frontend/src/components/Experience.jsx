@@ -37,7 +37,7 @@ const Dots = (props) => {
   );
 };
 
-export const Experience = ({meta_ui}) => {
+export const Experience = ({ meta_ui }) => {
   const cameraControls = useRef();
   const { cameraZoomed } = useChat();
 
