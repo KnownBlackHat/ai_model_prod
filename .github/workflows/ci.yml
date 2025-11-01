@@ -1,0 +1,56 @@
+name: Lint & Build Test
+
+on:
+  push:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+  
+permissions:
+  read-all
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: "sh -c 'cd backend && bun install'"
+      - run: "sh -c 'cd backend && bun run lint'"
+
+  format_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run prettier -c frontend/src
+
+  format_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run prettier -c backend/src
+
+  build_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: "sh -c 'cd frontend && bun install'"
+      - run: "sh -c 'cd frontend && bun run build'"
+
+  build_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: "sh -c 'cd backend && bun install'"
+      - run: "sh -c 'cd backend && bun run build'"
+
