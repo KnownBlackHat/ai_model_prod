@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: "sh -c 'cd frontend && bun install'"
-      - run: "sh -c 'cd frontend && bun run prettier . --write'"
+      - run: "sh -c 'cd frontend && bun run prettier . --check'"
 
   format_backend:
     runs-on: ubuntu-latest
@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: "sh -c 'cd backend && bun install'"
-      - run: "sh -c 'cd backend && bun run prettier . --write'"
+      - run: "sh -c 'cd backend && bun run prettier . --check'"
 
   build_frontend:
     runs-on: ubuntu-latest
