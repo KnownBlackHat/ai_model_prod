@@ -91,7 +91,7 @@ export function Avatar(props) {
     },
   });
 
-  const { message, onMessagePlayed, chat } = useChat();
+  const { message, onMessagePlayed, chat, stopChat } = useChat();
 
   const analyzeAudio = () => {
     requestAnimationFrame(analyzeAudio);
@@ -160,6 +160,14 @@ export function Avatar(props) {
   const [winkLeft, setWinkLeft] = useState(false);
   const [winkRight, setWinkRight] = useState(false);
   const [audio, setAudio] = useState();
+
+  useEffect(() => {
+    console.log("audio is null");
+    if (stopChat) {
+      audio.pause();
+      setAudio(null);
+    }
+  }, [stopChat]);
 
   useFrame(() => {
     !setupMode &&

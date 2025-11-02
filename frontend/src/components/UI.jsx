@@ -3,7 +3,7 @@ import { useChat } from "../hooks/useChat";
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from "react-icons/fa";
 import { TbHistory } from "react-icons/tb";
 import { TbHistoryOff } from "react-icons/tb";
-import { IoSendSharp } from "react-icons/io5";
+import { IoSendSharp, IoStopSharp } from "react-icons/io5";
 import CompanyLogo from "../assets/cybergenix.png";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoMdAddCircleOutline } from "react-icons/io";
@@ -12,8 +12,6 @@ import { MdDeleteOutline } from "react-icons/md";
 import { ErrorBoundary } from "react-error-boundary";
 import { Markdown } from "@davetheitguy/markdown-formatter";
 import ReactHtmlParser from "react-html-parser";
-
-// const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 export const UI = ({ hidden, meta_ui }) => {
   const input = useRef();
@@ -24,7 +22,7 @@ export const UI = ({ hidden, meta_ui }) => {
   const [username, setUsername] = useState();
   const [toggleContextHistory, setToggleContextHistory] = useState(true);
   const [chatHistory, setChatHistory] = useState([]);
-  const { chat, loading, message, chatId } = useChat();
+  const { chat, loading, message, chatId, setStopChat } = useChat();
   const [chatIds, setChatIds] = useState([]);
   const [speechCaption, setSpeechCaption] = useState("");
   const chatEndRef = useRef(null);
@@ -33,6 +31,10 @@ export const UI = ({ hidden, meta_ui }) => {
   function ErrorFallBack({ error }) {
     window.location.reload();
     console.log(error);
+  }
+
+  function stopChat() {
+    setStopChat(true);
   }
 
   async function fetchCredits() {
@@ -254,6 +256,7 @@ export const UI = ({ hidden, meta_ui }) => {
       return null;
     }
 
+    if (!input.current.value) return;
     meta_ui.setAnimation("Thinking_0");
     const text = input.current.value;
 
@@ -471,17 +474,22 @@ export const UI = ({ hidden, meta_ui }) => {
 
                   {audioState === "idle" && (
                     <div>
-                      <button
-                        disabled={loading || message}
-                        onClick={sendMessage}
-                        className={`text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all ${
-                          loading || message
-                            ? "cursor-not-allowed bg-gray-500 opacity-30"
-                            : ""
-                        }`}
-                      >
-                        <IoSendSharp />
-                      </button>
+                      {message ? (
+                        <button
+                          className="text-2xl bg-red-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-red-400/80 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:opacity-30 "
+                          onClick={stopChat}
+                        >
+                          <IoStopSharp />
+                        </button>
+                      ) : (
+                        <button
+                          disabled={loading || message}
+                          onClick={sendMessage}
+                          className="text-2xl bg-blue-600/80 border-2 border-white text-white p-4 px-10 font-semibold uppercase rounded-xl shadow-lg hover:bg-blue-400/80 transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:opacity-30 "
+                        >
+                          <IoSendSharp />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
