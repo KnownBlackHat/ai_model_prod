@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useChat } from "../hooks/useChat";
-import { FaMicrophoneAlt, FaMicrophoneAltSlash, FaBars } from "react-icons/fa";
+import { FaMicrophoneAlt, FaMicrophoneAltSlash } from "react-icons/fa";
 import { TbHistory } from "react-icons/tb";
 import { TbHistoryOff } from "react-icons/tb";
 import { IoSendSharp } from "react-icons/io5";
@@ -10,8 +10,9 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { Link, useNavigate } from "react-router";
 import { MdDeleteOutline } from "react-icons/md";
 import { ErrorBoundary } from "react-error-boundary";
+import { Markdown } from "@davetheitguy/markdown-formatter";
+import ReactHtmlParser from "react-html-parser";
 
-const WAKE_WORD = ["niva", " va ", "liva", "nibha", "nivba", "eva "];
 // const backendUrl = `${import.meta.env.VITE_BACKENDADDR}`;
 
 export const UI = ({ hidden, meta_ui }) => {
@@ -401,9 +402,11 @@ export const UI = ({ hidden, meta_ui }) => {
                       <div className="flex justify-between text-white overflow-hidden ">
                         <div className="text-left m-2 bg-slate-700 p-2 rounded-lg">
                           {item.assistant &&
-                            JSON.parse(item.assistant)
-                              .map((item) => item.text)
-                              .join("\n")}
+                            ReactHtmlParser(
+                              Markdown`${JSON.parse(item.assistant).map(
+                                (item) => item.text,
+                              )}`,
+                            )}
                         </div>
                         <div className="text-right m-2 bg-slate-800" />
                       </div>
