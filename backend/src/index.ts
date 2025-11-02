@@ -2,8 +2,6 @@
 import {ElevenLabsClient} from '@elevenlabs/elevenlabs-js';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// eslint-disable-next-line n/no-unsupported-features/node-builtins
-import fs from 'fs/promises';
 import './instrument';
 import Sentry from '@sentry/node';
 
@@ -14,7 +12,7 @@ import express, {
   RequestHandler,
 } from 'express';
 
-import {streamToArrayBufferView} from './helper';
+import {streamToBase64} from './helper';
 import {groq} from './llm_interface';
 import jwt from 'jsonwebtoken';
 import {expend_credit, get_credit} from './controller/credits';
@@ -178,14 +176,7 @@ app.post('/chat/:id', async (req, res) => {
       outputFormat: 'mp3_44100_128',
     });
 
-    const fileName = `audios/${req.params.id}_${i}.wav`;
-    const audioBuffer = await streamToArrayBufferView(audio);
-    try {
-      await fs.writeFile(fileName, audioBuffer);
-    } catch (e) {
-      console.log('error file write: ', e);
-    }
-    message.audio = Buffer.from(audioBuffer).toString('base64');
+    message.audio = await streamToBase64(audio);
   }
 
   const task = [];

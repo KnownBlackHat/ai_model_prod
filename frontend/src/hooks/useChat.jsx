@@ -33,9 +33,23 @@ export const ChatProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [cameraZoomed, setCameraZoomed] = useState(true);
   const [chatId, setChatId] = useState(0);
+  const [stopChat, setStopChat] = useState(false);
   const onMessagePlayed = () => {
+    if (stopChat) {
+      setMessages([]);
+      setMessage(null);
+      return;
+    }
     setMessages((messages) => messages.slice(1));
   };
+
+  useEffect(() => {
+    if (stopChat) {
+      setMessages([]);
+      setMessage(null);
+      return;
+    }
+  }, [stopChat]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -56,6 +70,8 @@ export const ChatProvider = ({ children }) => {
         setCameraZoomed,
         chatId,
         setChatId,
+        stopChat,
+        setStopChat,
       }}
     >
       {children}
