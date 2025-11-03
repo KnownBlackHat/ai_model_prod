@@ -149,7 +149,6 @@ app.post('/chat/:id', async (req, res) => {
       facialExpression: "smile,etc",
       animation: "animation name",
       audio: "Base64 file",
-      lipsync: {metadata: {}, mouthCues: []}
     }
     */
 

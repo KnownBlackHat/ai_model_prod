@@ -162,7 +162,6 @@ export function Avatar(props) {
   const [audio, setAudio] = useState();
 
   useEffect(() => {
-    console.log("audio is null");
     if (stopChat) {
       audio.pause();
       setAudio(null);

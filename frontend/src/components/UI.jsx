@@ -237,15 +237,15 @@ export const UI = ({ hidden, meta_ui }) => {
       setaudioState("listen");
 
       window.rec.addEventListener("end", (e) => {
-        if (word) {
-          speechReconCleanup(speech);
-          speech = "";
-          setSpeechCaption("");
-          window.rec.stop();
-        } else {
-          meta_ui.setAnimation("Idle");
-          window?.micd ? null : window.rec.start();
-        }
+        // if (word) {
+        speechReconCleanup(speech);
+        speech = "";
+        setSpeechCaption("");
+        window.rec.stop();
+        // } else {
+        //   meta_ui.setAnimation("Idle");
+        //   window?.micd ? null : window.rec.start();
+        // }
       });
     } catch {}
   };
