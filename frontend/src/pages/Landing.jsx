@@ -35,7 +35,7 @@ function Niva() {
               Try Now
             </Link>
             <a
-              href="/#pricing"
+              href="/#login"
               className="rounded-lg bg-white/10 px-5 py-2 font-semibold"
             >
               Login
