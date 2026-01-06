@@ -45,7 +45,7 @@ let router = createHashRouter([
     element: (
       <>
         {" "}
-        <Header /> <Landing /> <Pricing /> <Footer />{" "}
+        <Header /> <Landing /> <Footer />{" "}
       </>
     ),
   },

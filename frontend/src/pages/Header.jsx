@@ -10,20 +10,9 @@ function Header() {
         </a>
 
         <div className="px-8 space-x-16">
-          <Link to="/" className="hover:border-b-2 hover: border-blue-700">
-            {" "}
-            Home
-          </Link>
           <Link to="/login" className="hover:border-b-2 hover: border-blue-700">
             {" "}
             Login
-          </Link>
-          <Link
-            to="/#pricing"
-            className="hover:border-b-2 hover: border-blue-700"
-          >
-            {" "}
-            Pricing{" "}
           </Link>
         </div>
       </div>

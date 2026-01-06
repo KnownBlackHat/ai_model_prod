@@ -38,7 +38,7 @@ function Niva() {
               href="/#pricing"
               className="rounded-lg bg-white/10 px-5 py-2 font-semibold"
             >
-              Buy Now
+              Login
             </a>
           </div>
 
