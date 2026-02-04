@@ -1,2 +1,4 @@
 docker-compose-dev.yaml
 **/node_modules/
+**/__pycache__/
+.env
