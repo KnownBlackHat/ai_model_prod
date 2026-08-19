@@ -10,7 +10,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { Link, useNavigate } from "react-router";
 import { MdDeleteOutline } from "react-icons/md";
 import { ErrorBoundary } from "react-error-boundary";
-import { Markdown } from "@davetheitguy/markdown-formatter";
+// import { Markdown } from "@davetheitguy/markdown-formatter";
 import ReactHtmlParser from "react-html-parser";
 
 export const UI = ({ hidden, meta_ui }) => {
@@ -406,9 +406,9 @@ export const UI = ({ hidden, meta_ui }) => {
                         <div className="text-left m-2 bg-slate-700 p-2 rounded-lg">
                           {item.assistant &&
                             ReactHtmlParser(
-                              Markdown`${JSON.parse(item.assistant).map(
+                              JSON.parse(item.assistant).map(
                                 (item) => item.text,
-                              )}`,
+                              ),
                             )}
                         </div>
                         <div className="text-right m-2 bg-slate-800" />
