@@ -70,7 +70,7 @@ let router = createHashRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <GoogleOAuthProvider clientId="135356168446-nc4dmfkl79lr4kujah9vv3oti5doqtlh.apps.googleusercontent.com">
+  <GoogleOAuthProvider clientId="929845214297-rvi3cfvig585sv7budjvfqn52geobcif.apps.googleusercontent.com">
     <React.StrictMode>
       <RouterProvider router={router} />
     </React.StrictMode>
